@@ -9,6 +9,7 @@ app = Flask(__name__)
 bucket = custombucket
 region = customregion
 
+#make env variables
 db_conn = connections.Connection(
     host=customhost,
     port=3306,
