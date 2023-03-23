@@ -1,6 +1,0 @@
-customhost = "party-resources.crurrv9mzw4i.us-west-1.rds.amazonaws.com"
-customuser = "cmvallat"
-custompass = "Gdtbath21!"
-customdb = "employee"
-custombucket = "addparty"
-customregion = "us-west-1"
