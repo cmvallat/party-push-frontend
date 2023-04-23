@@ -20,28 +20,47 @@ export default function CreateAccount() {
     }
 
     const createAccount = () => {
-        const body = {
-            "party_name": "sickassparty1",
-            "party_code": "ballsandboobs1",
-            "phone_number": "888888888881",
-            "spotify_device_id": "deeznuts1",
-            "invite_only": 0
+
+        //todo: don't hardcode, get from user input
+        //ok to hardcode for local testing but dont push any sensitive info
+        //also, have to send as one body, not individual parameters
+        const host_body = {
+            "party_name": "example_party_name",
+            "party_code": "example_party_code",
+            "phone_number": "example_phone_number",
+            "spotify_device_id": "example_spotify_id",
+            "invite_only": 1
         }
-        fetch(
-            "https://localhost:5001/upsert-host",
-            {
-                method: "POST",
-                body: JSON.stringify(body),
-            }
-        ).then((response) => {
+
+        const guest_body = {
+            "party_code": "example_party_code",
+            "guest_name": "example_guest_name",
+            "at_party": 1
+        }
+
+        //Todo: add params and methods for GETs
+
+        //the correct base endpoint is: https://localhost:5001/Demo/
+        //and then add your endpoint path at the end
+        fetch("https://localhost:5001/Demo/upsert-host",
+        {
+            method: "POST",
+            headers: {
+            "Content-Type": "application/json"
+            },
+            body: JSON.stringify(host_body)
+        })
+            .then((response) => {
             if (response.ok) {
                 return response.json();
             }
             throw response;
-        }).then((data) => {
+            })
+            .then((data) => {
             console.log(data);
-        }).catch((error) => console.log("Error:" + error));
-    }
+            })
+            .catch((error) => console.log("Error:" + error));
+        };
 
     return (
         <>
