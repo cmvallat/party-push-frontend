@@ -38,6 +38,8 @@ export default function CreateAccount() {
             "at_party": 1
         }
 
+        //Todo: add params and methods for GETs
+
         //the correct base endpoint is: https://localhost:5001/Demo/
         //and then add your endpoint path at the end
         fetch("https://localhost:5001/Demo/upsert-host",
