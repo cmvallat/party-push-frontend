@@ -53,6 +53,9 @@ export default function Invite() {
                             />
                         </div>
                     </div>
+                    <button className="button is-primary" type="submit">
+                        Invite Guest
+                    </button>
                 </form>
             </section>
         </>
