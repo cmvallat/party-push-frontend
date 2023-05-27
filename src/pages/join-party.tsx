@@ -6,7 +6,7 @@ export default function JoinParty() {
     const [guestInfo, setGuestInfo] = useState({
         guestName: "",
         partyCode: "",
-        atParty: false,
+        atParty: 0,
     });
 
     const handleChange = (key: string, value: string) => {
@@ -46,7 +46,7 @@ export default function JoinParty() {
         <>
             <NavBar />
             <section className="section">
-                <form className="box" onSubmit={() => joinParty}>
+                <form className="box" onSubmit={joinParty}>
                     <div className="field">
                         <label className="label">Guest Name</label>
                         <div className="control">
@@ -74,8 +74,8 @@ export default function JoinParty() {
                         <div className="control">
                             <input
                                 id="atParty"
-                                className="checkbox"
-                                type="checkbox"
+                                className="input"
+                                type="text"
                                 onChange={e => handleChange('atParty', e.target.value)}
                             />
                         </div>

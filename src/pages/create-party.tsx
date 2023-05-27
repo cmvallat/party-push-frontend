@@ -94,11 +94,11 @@ export default function CreateParty() {
                         <label className="label">Spotify Device Id</label>
                         <div className="control">
                             <input
-                                id="phoneNumber"
+                                id="spotifyDeviceId"
                                 className="input"
                                 type="text"
                                 placeholder="Spotify Device Id"
-                                onChange={e => handleChange('phoneNumber', e.target.value)}
+                                onChange={e => handleChange('spotifyDeviceId', e.target.value)}
                             />
                         </div>
                     </div>
