@@ -1,12 +1,13 @@
 import NavBar from '@/components/NavBar'
 import Link from 'next/link';
+import { toast } from 'react-toastify';
 import { FormEvent, useState } from 'react';
+import Router from 'next/router';
 
 export default function JoinParty() {
     const [guestInfo, setGuestInfo] = useState({
         guestName: "",
         partyCode: "",
-        atParty: 0,
     });
 
     const handleChange = (key: string, value: string) => {
@@ -21,10 +22,10 @@ export default function JoinParty() {
         const body = {
             "guest_name": guestInfo.guestName,
             "party_code": guestInfo.partyCode,
-            "at_party": guestInfo.atParty,
+            "at_party": 1,
         }
         fetch(
-            "https://localhost:5001/Demo/upsert-guest",
+            `https://localhost:5001/Demo/upsert-guest`,
             {
                 method: "POST",
                 headers: {
@@ -38,8 +39,11 @@ export default function JoinParty() {
             }
             throw response;
         }).then((data) => {
-            console.log(data);
-        }).catch((error) => console.log("Error:" + error));
+            Router.push(`/guest/${guestInfo.partyCode}-${guestInfo.guestName}/`)
+        }).catch((error) => {
+            console.log("Error:" + error)
+            toast("Guest not found, please try again", { hideProgressBar: true, autoClose: 2000, type: 'error' })
+        });
     }
 
     return (
@@ -52,8 +56,8 @@ export default function JoinParty() {
                         <div className="control">
                             <input
                                 className="input"
-                                type="email"
-                                placeholder="e.g. alex@example.com"
+                                type="text"
+                                placeholder="Guest Name"
                                 onChange={e => handleChange('guestName', e.target.value)}
                             />
                         </div>
@@ -66,17 +70,6 @@ export default function JoinParty() {
                                 type="text"
                                 placeholder="Party Code"
                                 onChange={e => handleChange('partyCode', e.target.value)}
-                            />
-                        </div>
-                    </div>
-                    <div className="field">
-                        <label className="label">Invite Only</label>
-                        <div className="control">
-                            <input
-                                id="atParty"
-                                className="input"
-                                type="text"
-                                onChange={e => handleChange('atParty', e.target.value)}
                             />
                         </div>
                     </div>

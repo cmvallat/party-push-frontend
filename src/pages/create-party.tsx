@@ -1,9 +1,10 @@
 import NavBar from '@/components/NavBar'
 import Link from 'next/link';
 import Router from 'next/router';
+import { IPageProps } from './_app';
 import { FormEvent, useState } from 'react';
 
-export default function CreateParty() {
+export default function CreateParty({data, setData}: IPageProps) {
     const [partyInfo, setPartyInfo] = useState({
         partyName: "",
         partyCode: "",
@@ -29,7 +30,7 @@ export default function CreateParty() {
             "invite_only": partyInfo.inviteOnly ? 1 : 0,
         }
         fetch(
-            "https://localhost:5001/Demo/upsert-host",
+            `https://localhost:5001/Demo/create-party`,
             {
                 method: "POST",
                 headers: {
@@ -38,11 +39,11 @@ export default function CreateParty() {
                 body: JSON.stringify(body),
             }
         ).then((response) => {
-            if (response.ok && partyInfo.inviteOnly) {
-                Router.push("/create-party/invite");
-            } else if (response.ok) {
-                Router.push("/create-party/provisions")
-            }
+            setData({
+                inviteOnly: partyInfo.inviteOnly ? 1 : 0,
+                partyCode: partyInfo.partyCode,
+            })
+            Router.push("/party-management");
             throw response;
         }).then((data) => {
             console.log(data);

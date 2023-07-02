@@ -19,7 +19,7 @@ export default function Provisions() {
             "food_name": provisions.foodName,
         }
         fetch(
-            "https://localhost:5001/Demo/provisions",
+            `https://localhost:5001/Demo/provisions`,
             {
                 method: "POST",
                 headers: {

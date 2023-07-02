@@ -1,4 +1,5 @@
 import NavBar from '@/components/NavBar'
+import { toast } from 'react-toastify';
 import { FormEvent, useState } from 'react';
 
 export default function Invite() {
@@ -19,7 +20,7 @@ export default function Invite() {
             "guest_name": inviteInfo.guestName,
         }
         fetch(
-            "https://localhost:5001/Demo/invite",
+            `https://localhost:5001/Demo/invite`,
             {
                 method: "POST",
                 headers: {
@@ -34,14 +35,18 @@ export default function Invite() {
             throw response;
         }).then((data) => {
             console.log(data);
-        }).catch((error) => console.log("Error:" + error));
+            toast('Invite Sent', { hideProgressBar: true, autoClose: 2000, type: 'success' })
+        }).catch((error) => {
+            console.log("Error:" + error)
+            toast("Failed: Retry", { hideProgressBar: true, autoClose: 2000, type: 'error' })
+        });
     }
 
     return (
         <>
             <NavBar />
             <section className="section">
-                <form className="box" onSubmit={() => inviteGuest}>
+                <form className="box" onSubmit={inviteGuest}>
                     <div className="field">
                         <label className="label">Invite Guest</label>
                         <div className="control">
