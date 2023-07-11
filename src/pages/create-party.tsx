@@ -4,13 +4,14 @@ import Router from 'next/router';
 import { IPageProps } from './_app';
 import { FormEvent, useState } from 'react';
 
-export default function CreateParty({data, setData}: IPageProps) {
+export default function CreateParty({hostData, setHostData}: IPageProps) {
     const [partyInfo, setPartyInfo] = useState({
         partyName: "",
         partyCode: "",
         phoneNumber: "",
         spotifyDeviceId: "",
         inviteOnly: false,
+        password: "",
     });
 
     const handleChange = (key: string, value: string) => {
@@ -22,24 +23,18 @@ export default function CreateParty({data, setData}: IPageProps) {
 
     const createParty = (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        const body = {
-            "party_name": partyInfo.partyName,
-            "party_code": partyInfo.partyCode,
-            "phone_number": partyInfo.phoneNumber,
-            "spotify_device_id": partyInfo.spotifyDeviceId,
-            "invite_only": partyInfo.inviteOnly ? 1 : 0,
-        }
+        const inviteOnly = partyInfo.inviteOnly ? 1 : 0;
         fetch(
-            `https://localhost:5001/Demo/create-party`,
+            `https://localhost:5001/Demo/create-party?Party_name=${partyInfo.partyName}&Party_code=${partyInfo.partyCode}&Phone_number=${partyInfo.phoneNumber}&Spotify_device_id=${partyInfo.spotifyDeviceId}&Invite_only=${inviteOnly}&Password=${partyInfo.password}`,
             {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify(body),
             }
         ).then((response) => {
-            setData({
+            setHostData({
+                ...hostData,
                 inviteOnly: partyInfo.inviteOnly ? 1 : 0,
                 partyCode: partyInfo.partyCode,
             })
@@ -76,6 +71,18 @@ export default function CreateParty({data, setData}: IPageProps) {
                                 type="text"
                                 placeholder="Party Code"
                                 onChange={e => handleChange('partyCode', e.target.value)}
+                            />
+                        </div>
+                    </div>
+                    <div className="field">
+                        <label className="label">Password</label>
+                        <div className="control">
+                            <input
+                                id="password"
+                                className="input"
+                                type="text"
+                                placeholder="Password"
+                                onChange={e => handleChange('password', e.target.value)}
                             />
                         </div>
                     </div>

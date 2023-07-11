@@ -7,21 +7,38 @@ import { Dispatch } from 'react';
 import type { AppProps } from 'next/app'
 
 export interface IPageProps {
-  data: {
+  guestData: {
+    guestName: string,
+    partyCode: string,
+  },
+  setGuestData: Dispatch<any>,
+  hostData: {
     inviteOnly: number, 
     partyCode: string,
   },
-  setData: Dispatch<any>,
+  setHostData: Dispatch<any>,
 }
 
 export default function App({ Component, pageProps }: AppProps) {
-  const [data, setData] = useState({
+  const [guestData, setGuestData] = useState({
+    guestName: "",
+    partyCode: "",
+    partyName: "",
+  })
+
+  const [hostData, setHostData] = useState({
     inviteOnly: 0,
     partyCode: "",
+    partyName: "",
   })
 
   return(<>
-    <Component {...pageProps} data={data} setData={setData} />
+    <Component {...pageProps} 
+      guestData={guestData} 
+      setGuestData={setGuestData} 
+      hostData={hostData}
+      setHostData={setHostData}
+    />
     <ToastContainer />
   </>)
 }

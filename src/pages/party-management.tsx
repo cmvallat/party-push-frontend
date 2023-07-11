@@ -5,7 +5,7 @@ import { FormEvent } from "react";
 import { toast } from "react-toastify";
 import Router from "next/router";
 
-export default function PartyManagement({ data }: IPageProps) {
+export default function PartyManagement({ hostData }: IPageProps) {
   const [managementInfo, setManagementInfo] = useState({
     guestName: "",
     guestList: [{ guest_name: "", party_code: "", at_party: 0 }],
@@ -18,11 +18,11 @@ export default function PartyManagement({ data }: IPageProps) {
     });
   };
 
-  useEffect(() => {
-    if (data.partyCode === "") {
+  useEffect(() => { 
+    if (hostData.partyCode === "") {
       Router.push(`/party-login`);
     }
-    fetch(`https://localhost:5001/Demo/get-current-guest-list?party_code=145`, {
+    fetch(`https://localhost:5001/Demo/get-current-guest-list?party_code=${hostData.partyCode}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -35,10 +35,12 @@ export default function PartyManagement({ data }: IPageProps) {
         throw response;
       })
       .then((data) => {
-        setManagementInfo({
-          ...managementInfo,
-          guestList: data,
-        });
+        if (!data.message) {
+          setManagementInfo({
+            ...managementInfo,
+            guestList: data,
+          });
+        } 
       })
       .catch((error) => console.log("Error:" + error));
   }, []);
@@ -46,12 +48,12 @@ export default function PartyManagement({ data }: IPageProps) {
   const addGuestFromHost = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const body = {
-      invite_only: data.inviteOnly,
+      invite_only: hostData.inviteOnly,
       guest_name: managementInfo.guestName,
-      party_code: data.partyCode,
+      party_code: hostData.partyCode,
     };
     fetch(
-      `https://localhost:5001/Demo/add-guest-from-host?host_invite_only=${data.inviteOnly}&guest_name=${managementInfo.guestName}&party_code=${data.partyCode}`,
+      `https://localhost:5001/Demo/add-guest-from-host?host_invite_only=${hostData.inviteOnly}&guest_name=${managementInfo.guestName}&party_code=${hostData.partyCode}`,
       {
         method: "POST",
         headers: {
@@ -61,10 +63,7 @@ export default function PartyManagement({ data }: IPageProps) {
       }
     )
       .then((response) => {
-        if (response.ok) {
-          return response.json();
-        }
-        throw response;
+        return response;
       })
       .then((data) => {
         console.log(data);
@@ -86,17 +85,12 @@ export default function PartyManagement({ data }: IPageProps) {
 
   const deleteGuest = (event: FormEvent<HTMLButtonElement>) => {
     event.preventDefault();
-    const body = {
-      at_party: 0,
-      guest_name: event.currentTarget.id,
-      party_code: data.partyCode,
-    };
-    fetch(`https://localhost:5001/Demo/delete-guest`, {
+    const guestName = event.currentTarget.id;
+    fetch(`https://localhost:5001/Demo/delete-guest?guest_name=${guestName}&party_code=${hostData.partyCode}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(body),
     })
       .then((response) => {
         if (response.ok) {
@@ -125,9 +119,10 @@ export default function PartyManagement({ data }: IPageProps) {
   return (
     <>
       <NavBar />
-      <div className="container">
+      <div className="hero is-fullheight-with-navbar">
+        <div className="hero-body">
         <div className="columns is-vcentered">
-          <div className="column is-half">
+          <div className="column is-full">
             <div className="notification is-primary">
               Guests at Party:
               <ol>
@@ -161,11 +156,12 @@ export default function PartyManagement({ data }: IPageProps) {
               </form>
             </div>
           </div>
-          <div className="column is-half">
+          <div className="column is-full">
             <div className="notification is-primary">
               Food and Drink information will go here.
             </div>
           </div>
+        </div>
         </div>
       </div>
     </>
