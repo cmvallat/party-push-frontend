@@ -2,9 +2,10 @@ import NavBar from '@/components/NavBar'
 import Link from 'next/link';
 import { toast } from 'react-toastify';
 import { FormEvent, useState } from 'react';
+import { IPageProps } from './_app';
 import Router from 'next/router';
 
-export default function JoinParty() {
+export default function JoinParty({ guestData, setGuestData }: IPageProps) {
     const [guestInfo, setGuestInfo] = useState({
         guestName: "",
         partyCode: "",
@@ -19,30 +20,27 @@ export default function JoinParty() {
 
     const joinParty = (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        const body = {
-            "guest_name": guestInfo.guestName,
-            "party_code": guestInfo.partyCode,
-            "at_party": 1,
-        }
         fetch(
-            `https://localhost:5001/Demo/upsert-guest`,
+            `https://localhost:5001/Demo/guest-check-in?party_code=${guestInfo.partyCode}&guest_name=${guestInfo.guestName}`,
             {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify(body),
             }
         ).then((response) => {
-            if (response.ok) {
-                return response.json();
-            }
-            throw response;
+            console.log(response);
         }).then((data) => {
-            Router.push(`/guest/${guestInfo.partyCode}-${guestInfo.guestName}/`)
+            setGuestData({
+                ...guestData,
+                guestName: guestInfo.guestName,
+                partyCode: guestInfo.partyCode,
+                partyName: "RETURN PARTY INFO",
+            })
+            Router.push(`/guest/`)
         }).catch((error) => {
             console.log("Error:" + error)
-            toast("Guest not found, please try again", { hideProgressBar: true, autoClose: 2000, type: 'error' })
+            toast("Please try again", { hideProgressBar: true, autoClose: 2000, type: 'error' })
         });
     }
 
