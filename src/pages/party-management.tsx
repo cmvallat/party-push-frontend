@@ -67,7 +67,7 @@ export default function PartyManagement({ hostData }: IPageProps) {
       })
       .then((data) => {
         console.log(data);
-        toast("Invite Sent", {
+        toast("Invite Sent to " + managementInfo.guestName, {
           hideProgressBar: true,
           autoClose: 2000,
           type: "success",
