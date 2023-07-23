@@ -138,7 +138,7 @@ export default function CreateParty({ hostData, setHostData }: IPageProps) {
         <form className="box">
           <div className="notification is-primary">
             Want to log in to an existing party? Click{" "}
-            <Link href="/party-login">here</Link>!
+            <Link href="host/host-login">here</Link>!
           </div>
         </form>
       </section>

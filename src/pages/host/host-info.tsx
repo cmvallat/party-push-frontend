@@ -21,7 +21,7 @@ export default function PartyManagement({ hostData }: IPageProps) {
 
   useEffect(() => {
     if (hostData.partyCode === "") {
-      Router.push(`/host-login`);
+      Router.push(`/host/host-login`);
     } else {
       fetch(
         `https://localhost:5001/Demo/get-current-guest-list?party_code=${hostData.partyCode}`,

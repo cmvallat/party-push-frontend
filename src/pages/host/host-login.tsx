@@ -65,7 +65,7 @@ export default function PartyLogin({ hostData, setHostData }: IPageProps) {
             </div>
           </div>
           <div className="field">
-            <label className="label">Party Code</label>
+            <label className="label">Password</label>
             <div className="control">
               <input
                 id="password"
