@@ -8,6 +8,7 @@ export default function PartyLogin({ hostData, setHostData }: IPageProps) {
   const [partyLoginInfo, setPartyLoginInfo] = useState({
     partyCode: "",
     password: "",
+    phoneNumber: "",
   });
 
   const handleChange = (key: string, value: string) => {
@@ -20,7 +21,7 @@ export default function PartyLogin({ hostData, setHostData }: IPageProps) {
   const getHost = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     fetch(
-      `https://localhost:5001/Demo/get-host?party_code=${partyLoginInfo.partyCode}`,
+      `https://localhost:5001/Demo/get-host-from-check-in?party_code=${partyLoginInfo.partyCode}&phone_number=${partyLoginInfo.phoneNumber}&password=${partyLoginInfo.password}`,
       {
         method: "GET",
         headers: {
@@ -36,7 +37,7 @@ export default function PartyLogin({ hostData, setHostData }: IPageProps) {
               ...hostData,
               partyCode: partyLoginInfo.partyCode,
             });
-            Router.push("/host/host-info");
+            Router.push("/host-info");
           } else {
             throw res;
           }
@@ -73,6 +74,18 @@ export default function PartyLogin({ hostData, setHostData }: IPageProps) {
                 type="text"
                 placeholder="Password"
                 onChange={(e) => handleChange("password", e.target.value)}
+              />
+            </div>
+          </div>
+          <div className="field">
+            <label className="label">Phone Number</label>
+            <div className="control">
+              <input
+                id="phoneNumber"
+                className="input"
+                type="text"
+                placeholder="Phone Number"
+                onChange={(e) => handleChange("phoneNumber", e.target.value)}
               />
             </div>
           </div>
