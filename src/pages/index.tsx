@@ -12,10 +12,10 @@ export default function Home() {
               Welcome to Party Push!
             </p>
             <p className="subtitle">
-              <Link className="button is-warning is-large mx-3" href="/join-party">
+              <Link className="button is-warning is-large mx-3" href="/guest/guest-login">
                 <strong>Guest</strong>
               </Link>
-              <Link className="button is-warning is-large mx-3" href="/create-party">
+              <Link className="button is-warning is-large mx-3" href="/host/create-party">
                 <strong>Host</strong>
               </Link>
             </p>

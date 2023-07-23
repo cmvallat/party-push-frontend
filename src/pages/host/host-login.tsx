@@ -1,13 +1,13 @@
 import NavBar from "@/components/NavBar";
 import Router from "next/router";
-import { IPageProps } from "./_app";
+import { IPageProps } from "../_app";
 import { FormEvent, useState } from "react";
+import { handleErrors } from "@/utils/utils";
 
 export default function PartyLogin({ hostData, setHostData }: IPageProps) {
   const [partyLoginInfo, setPartyLoginInfo] = useState({
-    partyCode: 0,
+    partyCode: "",
     password: "",
-    phoneNumber: "",
   });
 
   const handleChange = (key: string, value: string) => {
@@ -20,7 +20,7 @@ export default function PartyLogin({ hostData, setHostData }: IPageProps) {
   const getHost = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     fetch(
-      `https://localhost:5001/Demo/get-host-from-check-in?party_code=${partyLoginInfo.partyCode}&phone_number=${partyLoginInfo.phoneNumber}&password=${partyLoginInfo.password}`,
+      `https://localhost:5001/Demo/get-host?party_code=${partyLoginInfo.partyCode}`,
       {
         method: "GET",
         headers: {
@@ -28,20 +28,22 @@ export default function PartyLogin({ hostData, setHostData }: IPageProps) {
         },
       }
     )
-    .then((response) => {
-        if (response.ok) {
-            return response.json();
-        }
-        throw response;
-    }).then((responseData) => {
-        setHostData({
-            ...hostData,
-            inviteOnly: responseData.invite_only,
-            partyCode: responseData.party_code,
+      .then((response) => {
+        return response.json().then((res) => {
+          if (res.status === 200) {
+            setHostData({
+              ...hostData,
+              partyCode: partyLoginInfo.partyCode,
+            });
+            Router.push("/host-info");
+          } else {
+            throw res;
+          }
         });
-        Router.push(`/party-management`)
-    })
-    .catch((error) => console.log("Error:" + error));
+      })
+      .catch((error) => {
+        handleErrors(error);
+      });
   };
 
   return (
@@ -62,19 +64,7 @@ export default function PartyLogin({ hostData, setHostData }: IPageProps) {
             </div>
           </div>
           <div className="field">
-            <label className="label">Phone Number</label>
-            <div className="control">
-              <input
-                id="phoneNumber"
-                className="input"
-                type="text"
-                placeholder="Phone Number"
-                onChange={(e) => handleChange("phoneNumber", e.target.value)}
-              />
-            </div>
-          </div>
-          <div className="field">
-            <label className="label">Password</label>
+            <label className="label">Party Code</label>
             <div className="control">
               <input
                 id="password"

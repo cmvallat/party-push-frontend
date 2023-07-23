@@ -1,9 +1,10 @@
 import NavBar from "@/components/NavBar";
 import { useEffect, useState } from "react";
-import { IPageProps } from "./_app";
+import { IPageProps } from "../_app";
 import { FormEvent } from "react";
 import { toast } from "react-toastify";
 import Router from "next/router";
+import { handleErrors } from "@/utils/utils";
 
 export default function PartyManagement({ hostData }: IPageProps) {
   const [managementInfo, setManagementInfo] = useState({
@@ -18,40 +19,39 @@ export default function PartyManagement({ hostData }: IPageProps) {
     });
   };
 
-  useEffect(() => { 
+  useEffect(() => {
     if (hostData.partyCode === "") {
-      Router.push(`/party-login`);
-    }
-    fetch(`https://localhost:5001/Demo/get-current-guest-list?party_code=${hostData.partyCode}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-      .then((response) => {
-        if (response.ok) {
-          return response.json();
+      Router.push(`/host-login`);
+    } else {
+      fetch(
+        `https://localhost:5001/Demo/get-current-guest-list?party_code=${hostData.partyCode}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
         }
-        throw response;
-      })
-      .then((data) => {
-        if (!data.message) {
-          setManagementInfo({
-            ...managementInfo,
-            guestList: data,
+      )
+        .then((response) => {
+          return response.json().then((res) => {
+            if (res.status === 200) {
+              setManagementInfo({
+                ...managementInfo,
+                guestList: res,
+              });
+            } else {
+              throw res;
+            }
           });
-        } 
-      })
-      .catch((error) => console.log("Error:" + error));
+        })
+        .catch((error) => {
+          handleErrors(error);
+        });
+    }
   }, []);
 
   const addGuestFromHost = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const body = {
-      invite_only: hostData.inviteOnly,
-      guest_name: managementInfo.guestName,
-      party_code: hostData.partyCode,
-    };
     fetch(
       `https://localhost:5001/Demo/add-guest-from-host?host_invite_only=${hostData.inviteOnly}&guest_name=${managementInfo.guestName}&party_code=${hostData.partyCode}`,
       {
@@ -59,77 +59,73 @@ export default function PartyManagement({ hostData }: IPageProps) {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(body),
       }
     )
       .then((response) => {
-        return response;
-      })
-      .then((data) => {
-        console.log(data);
-        toast("Invite Sent to " + managementInfo.guestName, {
-          hideProgressBar: true,
-          autoClose: 2000,
-          type: "success",
+        return response.json().then((res) => {
+          if (res.status === 200) {
+            toast("Invite Sent", {
+              hideProgressBar: true,
+              autoClose: 2000,
+              type: "success",
+            });
+          } else {
+            throw res;
+          }
         });
       })
       .catch((error) => {
-        console.log("Error:" + error);
-        toast("Failed: Retry", {
-          hideProgressBar: true,
-          autoClose: 2000,
-          type: "error",
-        });
+        handleErrors(error);
       });
   };
 
   const deleteGuest = (event: FormEvent<HTMLButtonElement>) => {
     event.preventDefault();
     const guestName = event.currentTarget.id;
-    fetch(`https://localhost:5001/Demo/delete-guest?guest_name=${guestName}&party_code=${hostData.partyCode}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
+    fetch(
+      `https://localhost:5001/Demo/delete-guest?guest_name=${guestName}&party_code=${hostData.partyCode}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    )
       .then((response) => {
-        if (response.ok) {
-          return response.json();
-        }
-        throw response;
-      })
-      .then((data) => {
-        console.log(data);
-        toast("Guest Deleted", {
-          hideProgressBar: true,
-          autoClose: 2000,
-          type: "success",
+        return response.json().then((res) => {
+          if (res.status === 200) {
+            toast("Guest Deleted", {
+              hideProgressBar: true,
+              autoClose: 2000,
+              type: "success",
+            });
+          } else {
+            throw res;
+          }
         });
       })
       .catch((error) => {
-        console.log("Error:" + error);
-        toast("Failed: Retry", {
-          hideProgressBar: true,
-          autoClose: 2000,
-          type: "error",
-        });
-      });
+        handleErrors(error);
+      })
   };
 
   return (
     <>
       <NavBar />
-      <div className="hero is-fullheight-with-navbar">
-        <div className="hero-body">
+      <div className="container">
         <div className="columns is-vcentered">
-          <div className="column is-full">
+          <div className="column is-half">
             <div className="notification is-primary">
               Guests at Party:
               <ol>
                 {managementInfo.guestList.map((guest) => (
                   <li>
                     {guest.guest_name}
-                    <button className="delete" id={guest.guest_name} onClick={deleteGuest}></button>
+                    <button
+                      className="delete"
+                      id={guest.guest_name}
+                      onClick={deleteGuest}
+                    ></button>
                   </li>
                 ))}
               </ol>
@@ -156,12 +152,11 @@ export default function PartyManagement({ hostData }: IPageProps) {
               </form>
             </div>
           </div>
-          <div className="column is-full">
+          <div className="column is-half">
             <div className="notification is-primary">
               Food and Drink information will go here.
             </div>
           </div>
-        </div>
         </div>
       </div>
     </>
