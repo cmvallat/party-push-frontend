@@ -29,8 +29,9 @@ export default function PartyLogin({ hostData, setHostData }: IPageProps) {
       }
     )
       .then((response) => {
+        const status = response.status;
         return response.json().then((res) => {
-          if (res.status === 200) {
+          if (status === 200) {
             setHostData({
               ...hostData,
               partyCode: partyLoginInfo.partyCode,

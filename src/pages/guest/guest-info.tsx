@@ -34,7 +34,7 @@ export default function GuestInfo({ guestData }: IPageProps) {
       )
         .then((response) => {
           return response.json().then((res) => {
-            if (res.status === 200) {
+            if (response.status === 200) {
               setGuestInfo({
                 ...guestInfo,
                 partyName: res["Party_name"],
@@ -54,7 +54,7 @@ export default function GuestInfo({ guestData }: IPageProps) {
     event.preventDefault();
     const guestName = event.currentTarget.id;
     fetch(
-      `https://localhost:5001/Demo/leave-party?party_code=${guestData.partyCode}&guest_name=${guestInfo.guestName}`,
+      `https://localhost:5001/Demo/leave-party?party_code=${guestData.partyCode}&guest_name=${guestName}`,
       {
         method: "POST",
         headers: {
@@ -64,7 +64,7 @@ export default function GuestInfo({ guestData }: IPageProps) {
     )
       .then((response) => {
         return response.json().then((res) => {
-          if (res.status === 200) {
+          if (response.status === 200) {
             toast("Guest Deleted", {
               hideProgressBar: true,
               autoClose: 2000,

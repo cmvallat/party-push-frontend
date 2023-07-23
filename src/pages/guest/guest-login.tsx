@@ -28,7 +28,7 @@ export default function GuestLogin({ guestData, setGuestData}: IPageProps) {
     })
       .then((response) => {
         return response.json().then((res) => {
-          if (res.status === 200) {
+          if (response.status === 200) {
             setGuestData({
                 ...guestData,
                 partyCode: guestLogin.partyCode,

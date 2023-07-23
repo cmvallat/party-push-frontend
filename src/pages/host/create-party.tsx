@@ -35,20 +35,18 @@ export default function CreateParty({ hostData, setHostData }: IPageProps) {
       }
     )
       .then((response) => {
-        if (response.status === 200) {
-          return response.json().then((res) => {
+        return response.json().then((res) => {
+          if (response.status === 200) {
             setHostData({
               ...hostData,
               inviteOnly: inviteOnly,
               partyCode: partyInfo.partyCode,
             });
             Router.push("/host/host-info");
-          });
-        } else {
-          throw response.json().then((error) => {
-            handleErrors(error);
-          });
-        }
+          } else {
+            throw res;
+          }
+        });
       })
       .catch((error) => {
         handleErrors(error);

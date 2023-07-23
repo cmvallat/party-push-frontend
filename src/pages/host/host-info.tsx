@@ -34,7 +34,7 @@ export default function PartyManagement({ hostData }: IPageProps) {
       )
         .then((response) => {
           return response.json().then((res) => {
-            if (res.status === 200) {
+            if (response.status === 200) {
               setManagementInfo({
                 ...managementInfo,
                 guestList: res,
@@ -63,7 +63,7 @@ export default function PartyManagement({ hostData }: IPageProps) {
     )
       .then((response) => {
         return response.json().then((res) => {
-          if (res.status === 200) {
+          if (response.status === 200) {
             toast("Invite Sent", {
               hideProgressBar: true,
               autoClose: 2000,
@@ -93,7 +93,7 @@ export default function PartyManagement({ hostData }: IPageProps) {
     )
       .then((response) => {
         return response.json().then((res) => {
-          if (res.status === 200) {
+          if (response.status === 200) {
             toast("Guest Deleted", {
               hideProgressBar: true,
               autoClose: 2000,
