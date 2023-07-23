@@ -7,8 +7,6 @@ import { handleErrors } from "@/utils/utils";
 
 export default function GuestInfo({ guestData }: IPageProps) {
   const [guestInfo, setGuestInfo] = useState({
-    guestName: "",
-    guestList: [{ guest_name: "", party_code: "", at_party: 0 }],
     partyName: "",
   });
 
@@ -37,7 +35,7 @@ export default function GuestInfo({ guestData }: IPageProps) {
             if (response.status === 200) {
               setGuestInfo({
                 ...guestInfo,
-                partyName: res["Party_name"],
+                partyName: res.message["party_name"],
               });
             } else {
               throw res;
@@ -87,7 +85,7 @@ export default function GuestInfo({ guestData }: IPageProps) {
         <div className="columns is-vcentered">
           <div className="column is-half">
             <div className="notification is-primary">
-              Welcome to {guestInfo.partyName}, {guestInfo.guestName}!
+              Welcome to {guestInfo.partyName}, {guestData.guestName}!
             </div>
             <br />
             <div className="notification is-primary">
