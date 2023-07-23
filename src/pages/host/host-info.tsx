@@ -21,7 +21,7 @@ export default function PartyManagement({ hostData }: IPageProps) {
 
   useEffect(() => {
     if (hostData.partyCode === "") {
-      Router.push(`/host/host-login`);
+      Router.push(`/host-login`);
     } else {
       fetch(
         `https://localhost:5001/Demo/get-current-guest-list?party_code=${hostData.partyCode}`,
@@ -37,7 +37,7 @@ export default function PartyManagement({ hostData }: IPageProps) {
             if (response.status === 200) {
               setManagementInfo({
                 ...managementInfo,
-                guestList: res,
+                guestList: res.guestList,
               });
             } else {
               throw res;
@@ -106,7 +106,7 @@ export default function PartyManagement({ hostData }: IPageProps) {
       })
       .catch((error) => {
         handleErrors(error);
-      })
+      });
   };
 
   return (
