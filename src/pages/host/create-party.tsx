@@ -42,7 +42,7 @@ export default function CreateParty({ hostData, setHostData }: IPageProps) {
               inviteOnly: inviteOnly,
               partyCode: partyInfo.partyCode,
             });
-            Router.push("/host-info");
+            Router.push("/host/host-info");
           });
         } else {
           throw response.json().then((error) => {
