@@ -303,11 +303,11 @@ export default function PartyManagement({ hostData }: IPageProps) {
             <div className="notification is-primary">
               Food:
               <ol>
-                {managementInfo.foodList.map((guest) => (
+                {managementInfo.foodList.map((food) => (
                   <li>
-                    {guest.item_name}
+                    {food.item_name}
                     <div className="select is-primary">
-                      <select id={guest.item_name} onChange={changeFoodStatusFromHost} value={guest.status}>
+                      <select id={food.item_name} onChange={changeFoodStatusFromHost} value={food.status}>
                         <option>full</option>
                         <option>low</option>
                         <option>out</option>
@@ -315,7 +315,7 @@ export default function PartyManagement({ hostData }: IPageProps) {
                     </div>
                     <button
                       className="delete"
-                      id={guest.item_name}
+                      id={food.item_name}
                       onClick={removeFoodItemFromHost}
                     ></button>
                   </li>
