@@ -2,51 +2,119 @@ import NavBar from "@/components/NavBar";
 import { useEffect, useState } from "react";
 import { IPageProps } from "../_app";
 import { toast } from "react-toastify";
+import { ChangeEvent } from "react";
 import Router from "next/router";
 import { handleErrors } from "@/utils/utils";
 
 export default function GuestInfo({ guestData }: IPageProps) {
   const [guestInfo, setGuestInfo] = useState({
+    foodList: [{ item_name: "", party_code: "", status: "" }],
     partyName: "",
   });
-
-  const handleChange = (key: string, value: string) => {
-    setGuestInfo({
-      ...guestInfo,
-      [key]: value,
-    });
-  };
 
   useEffect(() => {
     if (guestData.partyCode === "") {
       Router.push(`/guest-login`);
     } else {
-      fetch(
-        `https://localhost:5001/Demo/get-host?party_code=${guestData.partyCode}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      )
-        .then((response) => {
-          return response.json().then((res) => {
-            if (response.status === 200) {
-              setGuestInfo({
-                ...guestInfo,
-                partyName: res.message["party_name"],
-              });
-            } else {
-              throw res;
-            }
-          });
-        })
-        .catch((error) => {
-          handleErrors(error);
-        });
+      getHost();
+      getCurrentFoodList();
     }
   }, []);
+
+  const getHost = () => {
+    fetch(
+      `https://localhost:5001/Demo/get-host?party_code=${guestData.partyCode}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    )
+      .then((response) => {
+        return response.json().then((res) => {
+          if (response.status === 200) {
+            setGuestInfo((prevState) => ({
+              ...prevState,
+              partyName: res.message["party_name"],
+            }));
+          } else {
+            throw res;
+          }
+        });
+      })
+      .catch((error) => {
+        handleErrors(error);
+      });
+  }
+
+  const getCurrentFoodList = () => {
+    fetch(
+      `https://localhost:5001/Demo/get-current-food-list?party_code=${guestData.partyCode}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    )
+      .then((response) => {
+        return response.json().then((res) => {
+          if (response.status === 200) {
+            setGuestInfo((prevState) => ({
+              ...prevState,
+              foodList: res.message,
+            }));
+          } else {
+            throw res;
+          }
+        });
+      })
+      .catch((error) => {
+        handleErrors(error);
+      });
+  };
+
+  const changeFoodStatusFromGuest = (event: ChangeEvent<HTMLSelectElement>) => {
+    event.preventDefault();
+    const itemName = event.currentTarget.id;
+    const status = event.currentTarget.value;
+    fetch(
+      `https://localhost:5001/Demo/change-food-status-from-guest?party_code=${guestData.partyCode}&status=${status}&guest_name=${guestData.guestName}&item_name=${itemName}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    )
+      .then((response) => {
+        return response.json().then((res) => {
+          if (response.status === 200) {
+            const updatedFoodList = guestInfo.foodList
+            updatedFoodList.forEach((item) => {
+              if (item.item_name === itemName) {
+                item.status = status
+              }
+            })
+            setGuestInfo((prevState) => ({
+              ...prevState,
+              foodList: updatedFoodList,
+            }))
+            toast("Item Status Changed", {
+              hideProgressBar: true,
+              autoClose: 2000,
+              type: "success",
+            });
+          } else {
+            throw res;
+          }
+        });
+      })
+      .catch((error) => {
+        handleErrors(error);
+      });
+  };
 
   const leaveParty = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
@@ -98,7 +166,21 @@ export default function GuestInfo({ guestData }: IPageProps) {
           </div>
           <div className="column is-half">
             <div className="notification is-primary">
-              Food and Drink information will go here.
+              Food:
+              <ol>
+                {guestInfo.foodList.map((item) => (
+                  <li>
+                    {item.item_name}
+                    <div className="select is-primary">
+                      <select id={item.item_name} onChange={changeFoodStatusFromGuest} value={item.status}>
+                        <option>full</option>
+                        <option>low</option>
+                        <option>out</option>
+                      </select>
+                    </div>
+                  </li>
+                ))}
+              </ol>
             </div>
           </div>
         </div>
