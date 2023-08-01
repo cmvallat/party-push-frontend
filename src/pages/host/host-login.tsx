@@ -37,7 +37,7 @@ export default function PartyLogin({ hostData, setHostData }: IPageProps) {
               ...hostData,
               partyCode: partyLoginInfo.partyCode,
             });
-            Router.push("/host-info");
+            Router.push("/host/host-info");
           } else {
             throw res;
           }
