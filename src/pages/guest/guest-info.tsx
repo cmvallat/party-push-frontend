@@ -14,7 +14,7 @@ export default function GuestInfo({ guestData }: IPageProps) {
 
   useEffect(() => {
     if (guestData.partyCode === "") {
-      Router.push(`/guest-login`);
+      Router.push(`/`);
     } else {
       getHost();
       getCurrentFoodList();
@@ -39,7 +39,7 @@ export default function GuestInfo({ guestData }: IPageProps) {
               partyName: res.message["party_name"],
             }));
           } else {
-            throw res;
+            handleErrors(res);
           }
         });
       })
@@ -66,7 +66,7 @@ export default function GuestInfo({ guestData }: IPageProps) {
               foodList: res.message,
             }));
           } else {
-            throw res;
+            handleErrors(res);
           }
         });
       })
@@ -107,7 +107,7 @@ export default function GuestInfo({ guestData }: IPageProps) {
               type: "success",
             });
           } else {
-            throw res;
+            handleErrors(res);
           }
         });
       })
@@ -137,7 +137,7 @@ export default function GuestInfo({ guestData }: IPageProps) {
               type: "success",
             });
           } else {
-            throw res;
+            handleErrors(res);
           }
         });
       })

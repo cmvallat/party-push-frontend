@@ -44,7 +44,7 @@ export default function CreateParty({ hostData, setHostData }: IPageProps) {
             });
             Router.push("/host/host-info");
           } else {
-            throw res;
+            handleErrors(res);
           }
         });
       })

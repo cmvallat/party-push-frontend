@@ -1,6 +1,6 @@
 import NavBar from '@/components/NavBar'
 import Router from 'next/router';
-import { IPageProps } from './_app';
+import { IPageProps } from '../_app';
 import { toast } from 'react-toastify';
 import { FormEvent } from 'react';
 

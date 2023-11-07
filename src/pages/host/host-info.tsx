@@ -24,7 +24,7 @@ export default function PartyManagement({ hostData }: IPageProps) {
 
   useEffect(() => {
     if (hostData.partyCode === "") {
-      Router.push(`/host/host-login`);
+      Router.push(`/`);
     } else {
       getGuestList();
       getCurrentFoodList();
@@ -53,7 +53,7 @@ export default function PartyManagement({ hostData }: IPageProps) {
               foodList: res.message,
             }));
           } else {
-            throw res;
+            handleErrors(res);
           }
         });
       })
@@ -80,7 +80,7 @@ export default function PartyManagement({ hostData }: IPageProps) {
               guestList: res.guestList,
             }));
           } else {
-            throw res;
+            handleErrors(res);
           }
         });
       })
@@ -103,13 +103,17 @@ export default function PartyManagement({ hostData }: IPageProps) {
       .then((response) => {
         return response.json().then((res) => {
           if (response.status === 200) {
+            // setManagementInfo((prevState) => ({
+            //   ...prevState,
+            //   guestList: res.message,
+            // }));
             toast("Invite Sent", {
               hideProgressBar: true,
               autoClose: 2000,
               type: "success",
             });
           } else {
-            throw res;
+            handleErrors(res);
           }
         });
       })
@@ -133,13 +137,17 @@ export default function PartyManagement({ hostData }: IPageProps) {
       .then((response) => {
         return response.json().then((res) => {
           if (response.status === 200) {
+            setManagementInfo((prevState) => ({
+              ...prevState,
+              guestList: res.message,
+            }));
             toast("Guest Deleted", {
               hideProgressBar: true,
               autoClose: 2000,
               type: "success",
             });
           } else {
-            throw res;
+            handleErrors(res);
           }
         });
       })
@@ -172,7 +180,7 @@ export default function PartyManagement({ hostData }: IPageProps) {
               type: "success",
             });
           } else {
-            throw res;
+            handleErrors(res);
           }
         });
       })
@@ -213,7 +221,7 @@ export default function PartyManagement({ hostData }: IPageProps) {
               type: "success",
             });
           } else {
-            throw res;
+            handleErrors(res);
           }
         });
       })
@@ -247,7 +255,7 @@ export default function PartyManagement({ hostData }: IPageProps) {
               type: "success",
             });
           } else {
-            throw res;
+            handleErrors(res);
           }
         });
       })
