@@ -1,127 +1,67 @@
 import NavBar from "@/components/NavBar";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { IPageProps } from "./_app";
-import { FormEvent } from "react";
-import { toast } from "react-toastify";
-import { ChangeEvent } from "react";
-import Router from "next/router";
-import { handleErrors } from "@/utils/utils";
+import { GuestParty, HostParty, handleErrors, headers } from "@/utils/utils";
 
-export default function SelectParty({ hostData }: IPageProps) {
-  interface Party {
-    role: string;
-    created: string;
-    partyName: string;
-    startDate: string;
-    startTime: string;
-    invited: number;
-    attending: number;
-  }
+export default function SelectParty(props: IPageProps) {
+  interface SelectPartyI {
+    hostCards: HostParty[],
+    guestCards: GuestParty[],
+  };
 
-  const defaultParties: Party[] = [
-    {
-      role: "attending",
-      created: "10/14/23",
-      partyName: "Haloween Party",
-      startDate: "10/31/23",
-      startTime: "",
-      invited: 30,
-      attending: 15,
-    },
-    {
-      role: "hosting",
-      created: "10/23/23",
-      partyName: "Christmas Party",
-      startDate: "12/25/23",
-      startTime: "",
-      invited: 100,
-      attending: 60,
-    },
-    {
-      role: "attending",
-      created: "10/17/23",
-      partyName: "Lame Ass Party",
-      startDate: "10/31/23",
-      startTime: "",
-      invited: 2,
-      attending: 1,
-    },
-    {
-      role: "hosting",
-      created: "10/8/23",
-      partyName: "Nick's Party",
-      startDate: "11/14/23",
-      startTime: "",
-      invited: 1000,
-      attending: 1000,
-    },
-    {
-      role: "attending",
-      created: "10/7/23",
-      partyName: "Christian's Party",
-      startDate: "11/14/23",
-      startTime: "",
-      invited: 20,
-      attending: 0,
-    },
-    {
-      role: "attending",
-      created: "10/14/23",
-      partyName: "Haloween Party",
-      startDate: "10/31/23",
-      startTime: "",
-      invited: 30,
-      attending: 15,
-    },
-    {
-      role: "hosting",
-      created: "10/23/23",
-      partyName: "Christmas Party",
-      startDate: "12/25/23",
-      startTime: "",
-      invited: 100,
-      attending: 60,
-    },
-    {
-      role: "attending",
-      created: "10/17/23",
-      partyName: "Lame Ass Party",
-      startDate: "10/31/23",
-      startTime: "",
-      invited: 2,
-      attending: 1,
-    },
-    {
-      role: "hosting",
-      created: "10/8/23",
-      partyName: "Nick's Party",
-      startDate: "11/14/23",
-      startTime: "",
-      invited: 1000,
-      attending: 1000,
-    },
-    {
-      role: "attending",
-      created: "10/7/23",
-      partyName: "Christian's Party",
-      startDate: "11/14/23",
-      startTime: "",
-      invited: 20,
-      attending: 0,
-    },
-    {
-      role: "attending",
-      created: "10/7/23",
-      partyName: "Christian's Party",
-      startDate: "11/14/23",
-      startTime: "",
-      invited: 20,
-      attending: 0,
-    },
-  ];
+  const [selectPartyInfo, setSelectPartyInfo] = useState<SelectPartyI>({
+    hostCards: [],
+    guestCards: [],
+  });
 
-  const buildMatrix = (parties: Party[]) => {
-    const matrix = [];
+  useEffect(() => {
+    getParties();
+  }, []);
+
+  const getParties = () => {
+    fetch(`https://localhost:5001/Party/get-party-objects?username=nick`, {
+      method: "GET",
+      headers: headers(props),
+    })
+      .then((response) => {
+        const status = response.status;
+        return response.json().then((res) => {
+          if (status === 200) {
+            const hostCards: HostParty[] = res.message[0].map((party: any) => {
+              return {
+                username: party.username,
+                partyName: party.party_name,
+                partyCode: party.party_code,
+                phoneNumber: party.phone_number,
+                spotifyDeviceId: party.spotify_device_id,
+                inviteOnly: party.invite_only,
+              };
+            });
+            const guestCards: GuestParty[] = res.message[1].map((party: any) => {
+              return {
+                username: party.username,
+                guestName: party.guest_name,
+                partyCode: party.party_code,
+                atParty: party.at_party,
+              };
+            });
+            setSelectPartyInfo((prevState) => ({
+              ...prevState,
+              hostCards: hostCards,
+              guestCards: guestCards,
+            }));
+          } else {
+            handleErrors(res);
+          }
+        });
+      })
+      .catch((error) => {
+        handleErrors(error);
+      });
+  };
+
+  const buildHostMatrix = (parties: HostParty[]) => {
+    const matrix: HostParty[][] = [];
 
     while (parties.length) {
       matrix.push(parties.splice(0, 3));
@@ -129,16 +69,14 @@ export default function SelectParty({ hostData }: IPageProps) {
     return matrix;
   };
 
-  const attendingMatrix = buildMatrix(
-    defaultParties.filter((party) => {
-      return party.role === "attending";
-    })
-  );
-  const hostingMatrix = buildMatrix(
-    defaultParties.filter((party) => {
-      return party.role === "hosting";
-    })
-  );
+  const buildGuestMatrix = (parties: GuestParty[]) => {
+    const matrix: GuestParty[][] = [];
+
+    while (parties.length) {
+      matrix.push(parties.splice(0, 3));
+    }
+    return matrix;
+  };
 
   return (
     <>
@@ -148,28 +86,28 @@ export default function SelectParty({ hostData }: IPageProps) {
           <h1 className="title">Attending</h1>
           <div className="tile is-ancestor">
             <div className="tile is-vertical">
-              {attendingMatrix.map((row) => {
+              {buildGuestMatrix(selectPartyInfo.guestCards).map((row, index) => {
                 return (
-                  <div className="tile">
+                  <div className="tile" key={index}>
                     {row.map((party) => {
                       return (
-                        <div className="tile is-parent is-4">
+                        <a
+                          className="tile is-parent is-4"
+                          key={party.partyCode}
+                          href="/guest/guest-login"
+                        >
                           <article className="tile is-child notification is-primary">
-                            <p className="title">{party.partyName}</p>
+                            <p className="title">{party.partyCode}</p>
                             <p className="subtitle">
-                              Created: {party.created}
+                              Username: {party.username}
                               <br />
-                              Start Date: {party.startDate}
+                              Guest Name: {party.guestName}
                               <br />
-                              Start Time: {party.startTime}
-                              <br />
-                              Invited: {party.invited}
-                              <br />
-                              Attending: {party.attending}
+                              At Party: {party.atParty ? "Yes" : "No"}
                               <br />
                             </p>
                           </article>
-                        </div>
+                        </a>
                       );
                     })}
                   </div>
@@ -184,27 +122,28 @@ export default function SelectParty({ hostData }: IPageProps) {
           <h1 className="title">Hosting</h1>
           <div className="tile is-ancestor">
             <div className="tile is-vertical">
-              {hostingMatrix.map((row) => {
+              {buildHostMatrix(selectPartyInfo.hostCards).map((row, index) => {
                 return (
-                  <div className="tile">
+                  <div className="tile" key={index}>
                     {row.map((party) => {
                       return (
                         <a
                           className="tile is-parent is-4"
+                          key={party.partyCode}
                           href="/host/host-login"
                         >
                           <article className="tile is-child notification is-info">
-                            <p className="title">{party.partyName}</p>
+                            <p className="title">{party.partyCode}</p>
                             <p className="subtitle">
-                              Created: {party.created}
+                              Username: {party.username}
                               <br />
-                              Start Date: {party.startDate}
+                              Party Name: {party.partyName}
                               <br />
-                              Start Time: {party.startTime}
+                              Phone Number: {party.phoneNumber}
                               <br />
-                              Invited: {party.invited}
+                              Spotify Device Id: {party.spotifyDeviceId}
                               <br />
-                              Attending: {party.attending}
+                              Invite Only: {party.inviteOnly ? "Yes" : "No"}
                               <br />
                             </p>
                           </article>

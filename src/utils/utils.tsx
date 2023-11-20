@@ -23,7 +23,23 @@ export const handleErrors = (error: Error) => {
 
 export const headers = (props: IPageProps) => {
   return {
-    "Content-Type": "application/json",
-    bearer: props.authenticationData.token,
+    "Content-Type": `application/json`,
+    "Authorization": `Bearer ${props.authenticationData.token}`,
   };
 };
+
+export interface HostParty {
+  username: string;
+  partyName: string;
+  partyCode: string;
+  phoneNumber: string;
+  spotifyDeviceId: string;
+  inviteOnly: number;
+}
+
+export interface GuestParty {
+  username: string;
+  guestName: string;
+  partyCode: string;
+  atParty: number;
+}

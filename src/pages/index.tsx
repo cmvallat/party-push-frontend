@@ -19,19 +19,15 @@ export default function Login(props: IPageProps) {
     });
   };
 
-  const getHost = (event: FormEvent<HTMLFormElement>) => {
+  const getUser = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     fetch(
-      `https://localhost:5001/Demo/get-user`,
+      `https://localhost:5001/Party/get-user?username=${loginInfo.username}&password=${loginInfo.password}`,
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          "username": loginInfo.username,
-          "password": loginInfo.password,
-        }),
       }
     )
       .then((response) => {
@@ -57,7 +53,7 @@ export default function Login(props: IPageProps) {
     <>
       <NavBar />
       <section className="section">
-        <form className="box" onSubmit={getHost}>
+        <form className="box" onSubmit={getUser}>
           <div className="field">
             <label className="label">Username</label>
             <div className="control">

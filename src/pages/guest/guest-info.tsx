@@ -13,12 +13,8 @@ export default function GuestInfo({ guestData }: IPageProps) {
   });
 
   useEffect(() => {
-    if (guestData.partyCode === "") {
-      Router.push(`/`);
-    } else {
       getHost();
       getCurrentFoodList();
-    }
   }, []);
 
   const getHost = () => {
