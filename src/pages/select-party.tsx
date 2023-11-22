@@ -1,13 +1,14 @@
 import NavBar from "@/components/NavBar";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { IPageProps } from "./_app";
 import { GuestParty, HostParty, handleErrors, headers } from "@/utils/utils";
+import Router from "next/router";
 
 export default function SelectParty(props: IPageProps) {
   interface SelectPartyI {
-    hostCards: HostParty[],
-    guestCards: GuestParty[],
-  };
+    hostCards: HostParty[];
+    guestCards: GuestParty[];
+  }
 
   const [selectPartyInfo, setSelectPartyInfo] = useState<SelectPartyI>({
     hostCards: [],
@@ -37,14 +38,16 @@ export default function SelectParty(props: IPageProps) {
                 inviteOnly: party.invite_only,
               };
             });
-            const guestCards: GuestParty[] = res.message[1].map((party: any) => {
-              return {
-                username: party.username,
-                guestName: party.guest_name,
-                partyCode: party.party_code,
-                atParty: party.at_party,
-              };
-            });
+            const guestCards: GuestParty[] = res.message[1].map(
+              (party: any) => {
+                return {
+                  username: party.username,
+                  guestName: party.guest_name,
+                  partyCode: party.party_code,
+                  atParty: party.at_party,
+                };
+              }
+            );
             setSelectPartyInfo((prevState) => ({
               ...prevState,
               hostCards: hostCards,
@@ -86,33 +89,42 @@ export default function SelectParty(props: IPageProps) {
           <h1 className="title">Attending</h1>
           <div className="tile is-ancestor">
             <div className="tile is-vertical">
-              {buildGuestMatrix(selectPartyInfo.guestCards).map((row, index) => {
-                return (
-                  <div className="tile" key={index}>
-                    {row.map((party) => {
-                      return (
-                        <a
-                          className="tile is-parent is-4"
-                          key={party.partyCode}
-                          href="/guest/guest-login"
-                        >
-                          <article className="tile is-child notification is-primary">
-                            <p className="title">{party.partyCode}</p>
-                            <p className="subtitle">
-                              Username: {party.username}
-                              <br />
-                              Guest Name: {party.guestName}
-                              <br />
-                              At Party: {party.atParty ? "Yes" : "No"}
-                              <br />
-                            </p>
-                          </article>
-                        </a>
-                      );
-                    })}
-                  </div>
-                );
-              })}
+              {buildGuestMatrix(selectPartyInfo.guestCards).map(
+                (row, index) => {
+                  return (
+                    <div className="tile" key={index}>
+                      {row.map((party) => {
+                        return (
+                          <div
+                            className="tile is-parent is-4"
+                            key={party.partyCode}
+                            onClick={() => {
+                              props.setGuestData({
+                                ...props.guestData,
+                                guestName: party.guestName,
+                                partyCode: party.partyCode,
+                              });
+                              Router.push("/guest/guest-info");
+                            }}
+                          >
+                            <article className="tile is-child notification is-primary">
+                              <p className="title">{party.partyCode}</p>
+                              <p className="subtitle">
+                                Username: {party.username}
+                                <br />
+                                Guest Name: {party.guestName}
+                                <br />
+                                At Party: {party.atParty ? "Yes" : "No"}
+                                <br />
+                              </p>
+                            </article>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  );
+                }
+              )}
             </div>
           </div>
         </div>
@@ -120,6 +132,17 @@ export default function SelectParty(props: IPageProps) {
       <section className="section">
         <div className="box">
           <h1 className="title">Hosting</h1>
+          <div 
+            className="icon-text" 
+            onClick={() => {
+              Router.push("/host/create-party")
+            }}
+          >
+            <span className="icon">
+              <i className="fas fa-plane-departure"></i>
+            </span>
+            <span>flying</span>
+          </div>
           <div className="tile is-ancestor">
             <div className="tile is-vertical">
               {buildHostMatrix(selectPartyInfo.hostCards).map((row, index) => {
@@ -130,7 +153,14 @@ export default function SelectParty(props: IPageProps) {
                         <a
                           className="tile is-parent is-4"
                           key={party.partyCode}
-                          href="/host/host-login"
+                          onClick={() => {
+                            props.setHostData({
+                              ...props.hostData,
+                              inviteOnly: party.inviteOnly,
+                              partyCode: party.partyCode,
+                            });
+                            Router.push("/host/host-info");
+                          }}
                         >
                           <article className="tile is-child notification is-info">
                             <p className="title">{party.partyCode}</p>

@@ -3,28 +3,39 @@ import { useEffect, useState } from "react";
 import { IPageProps } from "../_app";
 import { toast } from "react-toastify";
 import { ChangeEvent } from "react";
-import Router from "next/router";
 import { handleErrors } from "@/utils/utils";
+import { headers } from "@/utils/utils";
+import Router from "next/router";
 
-export default function GuestInfo({ guestData }: IPageProps) {
-  const [guestInfo, setGuestInfo] = useState({
-    foodList: [{ item_name: "", party_code: "", status: "" }],
+export default function GuestInfo(props: IPageProps) {
+  interface FoodItem {
+    item_name: string;
+    party_code: string;
+    status: string;
+  }
+
+  interface GuestInfoI {
+    foodList: FoodItem[];
+    partyName: string;
+  }
+
+  const [guestInfo, setGuestInfo] = useState<GuestInfoI>({
+    foodList: [],
     partyName: "",
   });
 
   useEffect(() => {
-      getHost();
-      getCurrentFoodList();
+    getHost();
+    getCurrentFoodList();
+    checkIn();
   }, []);
 
   const getHost = () => {
     fetch(
-      `https://localhost:5001/Demo/get-host?party_code=${guestData.partyCode}`,
+      `https://localhost:5001/Party/get-host?party_code=${props.guestData.partyCode}`,
       {
         method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: headers(props),
       }
     )
       .then((response) => {
@@ -42,16 +53,14 @@ export default function GuestInfo({ guestData }: IPageProps) {
       .catch((error) => {
         handleErrors(error);
       });
-  }
+  };
 
   const getCurrentFoodList = () => {
     fetch(
-      `https://localhost:5001/Demo/get-current-food-list?party_code=${guestData.partyCode}`,
+      `https://localhost:5001/Party/get-current-foods?party_code=${props.guestData.partyCode}`,
       {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: headers(props),
       }
     )
       .then((response) => {
@@ -76,27 +85,25 @@ export default function GuestInfo({ guestData }: IPageProps) {
     const itemName = event.currentTarget.id;
     const status = event.currentTarget.value;
     fetch(
-      `https://localhost:5001/Demo/change-food-status-from-guest?party_code=${guestData.partyCode}&status=${status}&guest_name=${guestData.guestName}&item_name=${itemName}`,
+      `https://localhost:5001/Party/update-food-status-from-guest?party_code=${props.guestData.partyCode}&status=${status}&guest_name=${props.guestData.guestName}&item_name=${itemName}`,
       {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: headers(props),
       }
     )
       .then((response) => {
         return response.json().then((res) => {
           if (response.status === 200) {
-            const updatedFoodList = guestInfo.foodList
+            const updatedFoodList = guestInfo.foodList;
             updatedFoodList.forEach((item) => {
               if (item.item_name === itemName) {
-                item.status = status
+                item.status = status;
               }
-            })
+            });
             setGuestInfo((prevState) => ({
               ...prevState,
               foodList: updatedFoodList,
-            }))
+            }));
             toast("Item Status Changed", {
               hideProgressBar: true,
               autoClose: 2000,
@@ -114,20 +121,44 @@ export default function GuestInfo({ guestData }: IPageProps) {
 
   const leaveParty = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
-    const guestName = event.currentTarget.id;
     fetch(
-      `https://localhost:5001/Demo/leave-party?party_code=${guestData.partyCode}&guest_name=${guestName}`,
+      `https://localhost:5001/Party/leave-party?party_code=${props.guestData.partyCode}&guest_name=${props.guestData.guestName}`,
       {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: headers(props),
       }
     )
       .then((response) => {
         return response.json().then((res) => {
           if (response.status === 200) {
             toast("Guest Deleted", {
+              hideProgressBar: true,
+              autoClose: 2000,
+              type: "success",
+            });
+            Router.push(`/`);
+          } else {
+            handleErrors(res);
+          }
+        });
+      })
+      .catch((error) => {
+        handleErrors(error);
+      });
+  };
+
+  const checkIn = () => {
+    fetch(
+      `https://localhost:5001/Party/add-guest-from-check-in?party_code=${props.guestData.partyCode}&guest_name=${props.guestData.guestName}`,
+      {
+        method: "POST",
+        headers: headers(props),
+      }
+    )
+      .then((response) => {
+        return response.json().then((res) => {
+          if (response.status === 200) {
+            toast("Checked into party successfully", {
               hideProgressBar: true,
               autoClose: 2000,
               type: "success",
@@ -139,7 +170,7 @@ export default function GuestInfo({ guestData }: IPageProps) {
       })
       .catch((error) => {
         handleErrors(error);
-      })
+      });
   };
 
   return (
@@ -149,7 +180,7 @@ export default function GuestInfo({ guestData }: IPageProps) {
         <div className="columns is-vcentered">
           <div className="column is-half">
             <div className="notification is-primary">
-              Welcome to {guestInfo.partyName}, {guestData.guestName}!
+              Welcome to {guestInfo.partyName}, {props.guestData.guestName}!
             </div>
             <br />
             <div className="notification is-primary">
@@ -168,7 +199,11 @@ export default function GuestInfo({ guestData }: IPageProps) {
                   <li>
                     {item.item_name}
                     <div className="select is-primary">
-                      <select id={item.item_name} onChange={changeFoodStatusFromGuest} value={item.status}>
+                      <select
+                        id={item.item_name}
+                        onChange={changeFoodStatusFromGuest}
+                        value={item.status}
+                      >
                         <option>full</option>
                         <option>low</option>
                         <option>out</option>
