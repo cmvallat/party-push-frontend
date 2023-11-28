@@ -86,10 +86,10 @@ export default function CreateAccount(props: IPageProps) {
                 placeholder="Phone Number"
                 onChange={(e) => handleChange("phoneNumber", e.target.value)}
               />
-              <label className="label">
+              <strong>
                 By submitting, you authorize PartyPush to send text messages
                 with updates throughout the party. Message/data rates apply.
-              </label>
+              </strong>
             </div>
           </div>
           <button className="button is-primary" type="submit">
