@@ -39,7 +39,7 @@ export default function CreateAccount(props: IPageProps) {
               ...props.authenticationData,
               token: res.message,
             });
-            Router.push("/select-party")
+            Router.push("/select-party");
           } else {
             handleErrors(res);
           }
@@ -86,6 +86,10 @@ export default function CreateAccount(props: IPageProps) {
                 placeholder="Phone Number"
                 onChange={(e) => handleChange("phoneNumber", e.target.value)}
               />
+              <label className="label">
+                By submitting, you authorize PartyPush to send text messages
+                with updates throughout the party. Message/data rates apply.
+              </label>
             </div>
           </div>
           <button className="button is-primary" type="submit">
