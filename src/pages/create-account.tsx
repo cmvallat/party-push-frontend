@@ -1,27 +1,29 @@
 import NavBar from "@/components/NavBar";
+import { useState } from "react";
+import Link from "next/link";
+import { FormEvent } from "react";
+import { IPageProps } from "./_app";
 import Router from "next/router";
-import { IPageProps } from "../_app";
-import { FormEvent, useState } from "react";
 import { handleErrors } from "@/utils/utils";
 
-export default function PartyLogin({ hostData, setHostData }: IPageProps) {
-  const [partyLoginInfo, setPartyLoginInfo] = useState({
-    partyCode: "",
+export default function CreateAccount(props: IPageProps) {
+  const [createAccountInfo, setCreateAccountInfo] = useState({
+    username: "",
     password: "",
     phoneNumber: "",
   });
 
   const handleChange = (key: string, value: string) => {
-    setPartyLoginInfo({
-      ...partyLoginInfo,
+    setCreateAccountInfo({
+      ...createAccountInfo,
       [key]: value,
     });
   };
 
-  const getHost = (event: FormEvent<HTMLFormElement>) => {
+  const createAccount = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     fetch(
-      `https://localhost:5001/Demo/get-host-from-check-in?party_code=${partyLoginInfo.partyCode}&phone_number=${partyLoginInfo.phoneNumber}&password=${partyLoginInfo.password}`,
+      `https://livepartyhelper.com/Party/add-user?username=${createAccountInfo.username}&password=${createAccountInfo.password}&phone_number=${createAccountInfo.phoneNumber}`,
       {
         method: "GET",
         headers: {
@@ -33,13 +35,13 @@ export default function PartyLogin({ hostData, setHostData }: IPageProps) {
         const status = response.status;
         return response.json().then((res) => {
           if (status === 200) {
-            setHostData({
-              ...hostData,
-              partyCode: partyLoginInfo.partyCode,
+            props.setAuthenticationData({
+              ...props.authenticationData,
+              token: res.message,
             });
-            Router.push("/host/host-info");
+            Router.push("/select-party");
           } else {
-            throw res;
+            handleErrors(res);
           }
         });
       })
@@ -52,16 +54,15 @@ export default function PartyLogin({ hostData, setHostData }: IPageProps) {
     <>
       <NavBar />
       <section className="section">
-        <form className="box" onSubmit={getHost}>
+        <form className="box" onSubmit={createAccount}>
           <div className="field">
-            <label className="label">Party Code</label>
+            <label className="label">Username</label>
             <div className="control">
               <input
-                id="partyCode"
                 className="input"
                 type="text"
-                placeholder="Party Code"
-                onChange={(e) => handleChange("partyCode", e.target.value)}
+                placeholder="Username"
+                onChange={(e) => handleChange("username", e.target.value)}
               />
             </div>
           </div>
@@ -69,7 +70,6 @@ export default function PartyLogin({ hostData, setHostData }: IPageProps) {
             <label className="label">Password</label>
             <div className="control">
               <input
-                id="password"
                 className="input"
                 type="text"
                 placeholder="Password"
@@ -81,17 +81,26 @@ export default function PartyLogin({ hostData, setHostData }: IPageProps) {
             <label className="label">Phone Number</label>
             <div className="control">
               <input
-                id="phoneNumber"
                 className="input"
                 type="text"
                 placeholder="Phone Number"
                 onChange={(e) => handleChange("phoneNumber", e.target.value)}
               />
+              <strong>
+                By submitting, you authorize PartyPush to send text messages
+                with updates throughout the party. Message/data rates apply.
+              </strong>
             </div>
           </div>
           <button className="button is-primary" type="submit">
-            Go To Party
+            Create Account
           </button>
+        </form>
+        <form className="box">
+          <div className="notification is-primary">
+            Already have an account? Log in{" "}
+            <Link href="/create-account">here</Link>!
+          </div>
         </form>
       </section>
     </>

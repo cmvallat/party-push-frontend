@@ -6,9 +6,14 @@ import { ToastContainer } from "react-toastify";
 import { Dispatch } from "react";
 import type { AppProps } from "next/app";
 
+interface AuthenticationData {
+  token: string;
+}
+
 interface GuestData {
   guestName: string;
   partyCode: string;
+  partyName: string;
 }
 
 interface HostData {
@@ -17,16 +22,23 @@ interface HostData {
 }
 
 export interface IPageProps {
+  authenticationData: AuthenticationData;
   guestData: GuestData;
   hostData: HostData;
+  setAuthenticationData: Dispatch<AuthenticationData>;
   setGuestData: Dispatch<GuestData>;
   setHostData: Dispatch<HostData>;
 }
 
 export default function App({ Component, pageProps }: AppProps) {
+  const [authenticationData, setAuthenticationData] = useState({
+    token: "",
+  })
+
   const [guestData, setGuestData] = useState({
     guestName: "",
     partyCode: "",
+    partyName: "",
   });
 
   const [hostData, setHostData] = useState({
@@ -38,8 +50,10 @@ export default function App({ Component, pageProps }: AppProps) {
     <>
       <Component
         {...pageProps}
+        authenticationData={authenticationData}
         guestData={guestData}
         hostData={hostData}
+        setAuthenticationData={setAuthenticationData}
         setGuestData={setGuestData}
         setHostData={setHostData}
       />

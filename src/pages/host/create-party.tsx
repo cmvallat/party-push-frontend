@@ -4,14 +4,13 @@ import Router from "next/router";
 import { IPageProps } from "../_app";
 import { FormEvent, useState } from "react";
 import { handleErrors } from "@/utils/utils";
+import { headers } from "@/utils/utils";
 
-export default function CreateParty({ hostData, setHostData }: IPageProps) {
+export default function CreateParty(props: IPageProps) {
   const [partyInfo, setPartyInfo] = useState({
     partyName: "",
     partyCode: "",
     phoneNumber: "",
-    spotifyDeviceId: "",
-    password: "",
     inviteOnly: false,
   });
 
@@ -26,25 +25,23 @@ export default function CreateParty({ hostData, setHostData }: IPageProps) {
     event.preventDefault();
     const inviteOnly = partyInfo.inviteOnly ? 1 : 0;
     fetch(
-      `https://localhost:5001/Demo/create-party?Party_name=${partyInfo.partyName}&Party_code=${partyInfo.partyCode}&Phone_number=${partyInfo.phoneNumber}&Spotify_device_id=${partyInfo.spotifyDeviceId}&Invite_only=${inviteOnly}&Password=${partyInfo.password}`,
+      `https://localhost:5001/Party/add-host?Party_name=${partyInfo.partyName}&Party_code=${partyInfo.partyCode}&Phone_number=${partyInfo.phoneNumber}&Invite_only=${inviteOnly}`,
       {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: headers(props),
       }
     )
       .then((response) => {
         return response.json().then((res) => {
           if (response.status === 200) {
-            setHostData({
-              ...hostData,
+            props.setHostData({
+              ...props.hostData,
               inviteOnly: inviteOnly,
               partyCode: partyInfo.partyCode,
             });
             Router.push("/host/host-info");
           } else {
-            throw res;
+            handleErrors(res);
           }
         });
       })
@@ -91,32 +88,6 @@ export default function CreateParty({ hostData, setHostData }: IPageProps) {
                 type="text"
                 placeholder="Phone Number"
                 onChange={(e) => handleChange("phoneNumber", e.target.value)}
-              />
-            </div>
-          </div>
-          <div className="field">
-            <label className="label">Spotify Device Id</label>
-            <div className="control">
-              <input
-                id="spotifyDeviceId"
-                className="input"
-                type="text"
-                placeholder="Spotify Device Id"
-                onChange={(e) =>
-                  handleChange("spotifyDeviceId", e.target.value)
-                }
-              />
-            </div>
-          </div>
-          <div className="field">
-            <label className="label">Password</label>
-            <div className="control">
-              <input
-                id="password"
-                className="input"
-                type="text"
-                placeholder="Password"
-                onChange={(e) => handleChange("password", e.target.value)}
               />
             </div>
           </div>

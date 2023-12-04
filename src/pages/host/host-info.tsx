@@ -6,11 +6,12 @@ import { toast } from "react-toastify";
 import { ChangeEvent } from "react";
 import Router from "next/router";
 import { handleErrors } from "@/utils/utils";
+import { headers } from "@/utils/utils";
 
-export default function PartyManagement({ hostData }: IPageProps) {
+export default function PartyManagement(props: IPageProps) {
   const [managementInfo, setManagementInfo] = useState({
     foodList: [{ item_name: "", party_code: "", status: "" }],
-    guestName: "",
+    guestUsername: "",
     guestList: [{ guest_name: "", party_code: "", at_party: 0 }],
     itemName: "",
   });
@@ -23,53 +24,19 @@ export default function PartyManagement({ hostData }: IPageProps) {
   };
 
   useEffect(() => {
-    if (hostData.partyCode === "") {
-      Router.push(`/host/host-login`);
+    if (props.hostData.partyCode === "") {
+      Router.push(`/`);
     } else {
-      getGuestList();
-      getCurrentFoodList();
+      getPartyInfo();
     }
   }, []);
 
-  const getInfo = async () => {
-    await getGuestList();
-  };
-
-  const getCurrentFoodList = () => {
+  const getPartyInfo = () => {
     fetch(
-      `https://localhost:5001/Demo/get-current-food-list?party_code=${hostData.partyCode}`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    )
-      .then((response) => {
-        return response.json().then((res) => {
-          if (response.status === 200) {
-            setManagementInfo((prevState) => ({
-              ...prevState,
-              foodList: res.message,
-            }));
-          } else {
-            throw res;
-          }
-        });
-      })
-      .catch((error) => {
-        handleErrors(error);
-      });
-  };
-
-  const getGuestList = () => {
-    fetch(
-      `https://localhost:5001/Demo/get-current-guest-list?party_code=${hostData.partyCode}`,
+      `https://localhost:5001/Party/get-party-info?party_code=${props.hostData.partyCode}`,
       {
         method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: headers(props),
       }
     )
       .then((response) => {
@@ -77,10 +44,11 @@ export default function PartyManagement({ hostData }: IPageProps) {
           if (response.status === 200) {
             setManagementInfo((prevState) => ({
               ...prevState,
-              guestList: res.guestList,
+              guestList: res.message[0],
+              foodList: res.message[1],
             }));
           } else {
-            throw res;
+            handleErrors(res);
           }
         });
       })
@@ -92,24 +60,26 @@ export default function PartyManagement({ hostData }: IPageProps) {
   const addGuestFromHost = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     fetch(
-      `https://localhost:5001/Demo/add-guest-from-host?host_invite_only=${hostData.inviteOnly}&guest_name=${managementInfo.guestName}&party_code=${hostData.partyCode}`,
+      `https://localhost:5001/Party/add-guest-from-host?host_invite_only=${props.hostData.inviteOnly}&guest_name=${managementInfo.guestUsername}&party_code=${props.hostData.partyCode}&guest_username=${managementInfo.guestUsername}`,
       {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: headers(props),
       }
     )
       .then((response) => {
         return response.json().then((res) => {
           if (response.status === 200) {
+            // setManagementInfo((prevState) => ({
+            //   ...prevState,
+            //   guestList: res.message,
+            // }));
             toast("Invite Sent", {
               hideProgressBar: true,
               autoClose: 2000,
               type: "success",
             });
           } else {
-            throw res;
+            handleErrors(res);
           }
         });
       })
@@ -122,24 +92,26 @@ export default function PartyManagement({ hostData }: IPageProps) {
     event.preventDefault();
     const guestName = event.currentTarget.id;
     fetch(
-      `https://localhost:5001/Demo/delete-guest?guest_name=${guestName}&party_code=${hostData.partyCode}`,
+      `https://localhost:5001/Party/delete-guest?guest_name=${guestName}&party_code=${props.hostData.partyCode}`,
       {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: headers(props),
       }
     )
       .then((response) => {
         return response.json().then((res) => {
           if (response.status === 200) {
+            setManagementInfo((prevState) => ({
+              ...prevState,
+              guestList: res.message,
+            }));
             toast("Guest Deleted", {
               hideProgressBar: true,
               autoClose: 2000,
               type: "success",
             });
           } else {
-            throw res;
+            handleErrors(res);
           }
         });
       })
@@ -151,12 +123,10 @@ export default function PartyManagement({ hostData }: IPageProps) {
   const addFoodItemFromHost = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     fetch(
-      `https://localhost:5001/Demo/add-food-item-from-host?party_code=${hostData.partyCode}&item_name=${managementInfo.itemName}`,
+      `https://localhost:5001/Party/add-food-item-from-host?party_code=${props.hostData.partyCode}&item_name=${managementInfo.itemName}`,
       {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: headers(props),
       }
     )
       .then((response) => {
@@ -172,7 +142,7 @@ export default function PartyManagement({ hostData }: IPageProps) {
               type: "success",
             });
           } else {
-            throw res;
+            handleErrors(res);
           }
         });
       })
@@ -186,12 +156,10 @@ export default function PartyManagement({ hostData }: IPageProps) {
     const itemName = event.currentTarget.id;
     const status = event.currentTarget.value;
     fetch(
-      `https://localhost:5001/Demo/change-food-status-from-host?party_code=${hostData.partyCode}&status=${status}&item_name=${itemName}`,
+      `https://localhost:5001/Party/change-food-status-from-host?party_code=${props.hostData.partyCode}&status=${status}&item_name=${itemName}`,
       {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: headers(props),
       }
     )
       .then((response) => {
@@ -213,7 +181,7 @@ export default function PartyManagement({ hostData }: IPageProps) {
               type: "success",
             });
           } else {
-            throw res;
+            handleErrors(res);
           }
         });
       })
@@ -226,12 +194,10 @@ export default function PartyManagement({ hostData }: IPageProps) {
     event.preventDefault();
     const itemName = event.currentTarget.id;
     fetch(
-      `https://localhost:5001/Demo/remove-food-item-from-host?party_code=${hostData.partyCode}&item_name=${itemName}`,
+      `https://localhost:5001/Party/remove-food-item-from-host?party_code=${props.hostData.partyCode}&item_name=${itemName}`,
       {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: headers(props),
       }
     )
       .then((response) => {
@@ -247,7 +213,7 @@ export default function PartyManagement({ hostData }: IPageProps) {
               type: "success",
             });
           } else {
-            throw res;
+            handleErrors(res);
           }
         });
       })
@@ -265,30 +231,47 @@ export default function PartyManagement({ hostData }: IPageProps) {
             <div className="notification is-primary">
               Guests at Party:
               <ol>
-                {managementInfo.guestList.map((guest) => (
-                  <li>
-                    {guest.guest_name}
-                    <button
-                      className="delete"
-                      id={guest.guest_name}
-                      onClick={deleteGuest}
-                    ></button>
-                  </li>
-                ))}
+                {managementInfo.guestList.map((guest) => {
+                  if (guest.at_party === 1) {
+                    return (<li>
+                      {guest.guest_name}
+                      <button
+                        className="delete"
+                        id={guest.guest_name}
+                        onClick={deleteGuest}
+                      ></button>
+                    </li>)
+                  }
+                })}
+              </ol>
+              Guests invited:
+              <ol>
+                {managementInfo.guestList.map((guest) => {
+                  if (guest.at_party === 0) {
+                    return (<li>
+                      {guest.guest_name}
+                      <button
+                        className="delete"
+                        id={guest.guest_name}
+                        onClick={deleteGuest}
+                      ></button>
+                    </li>)
+                  }
+                })}
               </ol>
             </div>
             <br />
             <div className="notification is-primary">
               <form className="box" onSubmit={addGuestFromHost}>
                 <div className="field">
-                  <label className="label">Guest Name</label>
+                  <label className="label">Guest Username</label>
                   <div className="control">
                     <input
                       className="input"
                       type="text"
-                      placeholder="Guest Name"
+                      placeholder="Guest Username"
                       onChange={(e) =>
-                        handleChange("guestName", e.target.value)
+                        handleChange("guestUsername", e.target.value)
                       }
                     />
                   </div>
