@@ -21,7 +21,7 @@ export default function CreateParty(props: IPageProps) {
     });
   };
 
-  const createParty = (event: FormEvent<HTMLFormElement>) => {
+  const joinParty = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const inviteOnly = partyInfo.inviteOnly ? 1 : 0;
     fetch(
@@ -54,16 +54,16 @@ export default function CreateParty(props: IPageProps) {
     <>
       <NavBar />
       <section className="section">
-        <form className="box" onSubmit={createParty}>
+        <form className="box" onSubmit={joinParty}>
           <div className="field">
-            <label className="label">Party Name</label>
+            <label className="label">Guest Name</label>
             <div className="control">
               <input
                 id="guestName"
                 className="input"
                 type="text"
-                placeholder="Party Name"
-                onChange={(e) => handleChange("partyName", e.target.value)}
+                placeholder="Guest Name"
+                onChange={(e) => handleChange("guestName", e.target.value)}
               />
             </div>
           </div>
@@ -79,29 +79,6 @@ export default function CreateParty(props: IPageProps) {
               />
             </div>
           </div>
-          <div className="field">
-            <label className="label">Phone Number</label>
-            <div className="control">
-              <input
-                id="phoneNumber"
-                className="input"
-                type="text"
-                placeholder="Phone Number"
-                onChange={(e) => handleChange("phoneNumber", e.target.value)}
-              />
-            </div>
-          </div>
-          <div className="field">
-            <label className="label">Invite Only</label>
-            <div className="control">
-              <input
-                id="inviteOnly"
-                className="checkbox"
-                type="checkbox"
-                onChange={(e) => handleChange("inviteOnly", e.target.value)}
-              />
-            </div>
-          </div>
           <button className="button is-primary" type="submit">
             Join Party
           </button>
@@ -109,7 +86,7 @@ export default function CreateParty(props: IPageProps) {
         <form className="box">
           <div className="notification is-primary">
             Want to join an existing party? Click{" "}
-            <Link href="/host/host-login">here</Link>!
+            <Link href="host-login">here</Link>!
           </div>
         </form>
       </section>

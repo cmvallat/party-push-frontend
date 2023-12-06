@@ -1,31 +1,30 @@
-import NavBar from "@/components/NavBar";
-import { useState } from "react";
-import Link from "next/link";
-import { FormEvent } from "react";
-import { IPageProps } from "./_app";
-import Router from "next/router";
-import { handleErrors } from "@/utils/utils";
+import NavBar from '@/components/NavBar'
+import Link from 'next/link'
+import { FormEvent } from 'react';
+import { useState } from 'react';
+import Router from 'next/router';
+import { handleErrors } from '@/utils/utils';
+import { IPageProps } from './_app';
 
-export default function CreateAccount(props: IPageProps) {
-  const [createAccountInfo, setCreateAccountInfo] = useState({
+export default function Login(props: IPageProps) {
+  const [loginInfo, setLoginInfo] = useState({
     username: "",
     password: "",
-    phoneNumber: "",
   });
 
   const handleChange = (key: string, value: string) => {
-    setCreateAccountInfo({
-      ...createAccountInfo,
+    setLoginInfo({
+      ...loginInfo,
       [key]: value,
     });
   };
 
-  const createAccount = (event: FormEvent<HTMLFormElement>) => {
+  const getUser = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     fetch(
-      `https://localhost:5001/Party/add-user?username=${createAccountInfo.username}&password=${createAccountInfo.password}&phone_number=${createAccountInfo.phoneNumber}`,
+      `https://localhost:5001/Party/get-user?username=${loginInfo.username}&password=${loginInfo.password}`,
       {
-        method: "GET",
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
@@ -39,7 +38,7 @@ export default function CreateAccount(props: IPageProps) {
               ...props.authenticationData,
               token: res.message,
             });
-            Router.push("/select-party")
+            Router.push("/select-party");
           } else {
             handleErrors(res);
           }
@@ -54,7 +53,7 @@ export default function CreateAccount(props: IPageProps) {
     <>
       <NavBar />
       <section className="section">
-        <form className="box" onSubmit={createAccount}>
+        <form className="box" onSubmit={getUser}>
           <div className="field">
             <label className="label">Username</label>
             <div className="control">
@@ -77,25 +76,14 @@ export default function CreateAccount(props: IPageProps) {
               />
             </div>
           </div>
-          <div className="field">
-            <label className="label">Phone Number</label>
-            <div className="control">
-              <input
-                className="input"
-                type="text"
-                placeholder="Phone Number"
-                onChange={(e) => handleChange("phoneNumber", e.target.value)}
-              />
-            </div>
-          </div>
           <button className="button is-primary" type="submit">
-            Create Account
+            Login
           </button>
         </form>
         <form className="box">
           <div className="notification is-primary">
-            Already have an account? Log in{" "}
-            <Link href="/login">here</Link>!
+            Want to create an account? Create one{" "}
+            <Link href="/create-account">here</Link>!
           </div>
         </form>
       </section>
