@@ -23,7 +23,7 @@ export default function CreateAccount(props: IPageProps) {
   const createAccount = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     fetch(
-      `http://partypush.us-east-1.elasticbeanstalk.com/Party/add-user?username=${createAccountInfo.username}&password=${createAccountInfo.password}&phone_number=${createAccountInfo.phoneNumber}`,
+      `https://party-push-backend.us-east-1.elasticbeanstalk.com/Party/add-user?username=${createAccountInfo.username}&password=${createAccountInfo.password}&phone_number=${createAccountInfo.phoneNumber}`,
       {
         method: "GET",
         headers: {

@@ -33,7 +33,7 @@ export default function PartyManagement(props: IPageProps) {
 
   const getPartyInfo = () => {
     fetch(
-      `https://localhost:5001/Party/get-party-info?party_code=${props.hostData.partyCode}`,
+      `http://party-push-backend.us-east-1.elasticbeanstalk.com/Party/get-party-info?party_code=${props.hostData.partyCode}`,
       {
         method: "GET",
         headers: headers(props),
@@ -60,7 +60,7 @@ export default function PartyManagement(props: IPageProps) {
   const addGuestFromHost = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     fetch(
-      `https://localhost:5001/Party/add-guest-from-host?host_invite_only=${props.hostData.inviteOnly}&guest_name=${managementInfo.guestUsername}&party_code=${props.hostData.partyCode}&guest_username=${managementInfo.guestUsername}`,
+      `http://party-push-backend.us-east-1.elasticbeanstalk.com/Party/add-guest-from-host?host_invite_only=${props.hostData.inviteOnly}&guest_name=${managementInfo.guestUsername}&party_code=${props.hostData.partyCode}&guest_username=${managementInfo.guestUsername}`,
       {
         method: "POST",
         headers: headers(props),
@@ -92,7 +92,7 @@ export default function PartyManagement(props: IPageProps) {
     event.preventDefault();
     const guestName = event.currentTarget.id;
     fetch(
-      `https://localhost:5001/Party/delete-guest?guest_name=${guestName}&party_code=${props.hostData.partyCode}`,
+      `http://party-push-backend.us-east-1.elasticbeanstalk.com/Party/delete-guest?guest_name=${guestName}&party_code=${props.hostData.partyCode}`,
       {
         method: "POST",
         headers: headers(props),
@@ -123,7 +123,7 @@ export default function PartyManagement(props: IPageProps) {
   const addFoodItemFromHost = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     fetch(
-      `https://localhost:5001/Party/add-food-item-from-host?party_code=${props.hostData.partyCode}&item_name=${managementInfo.itemName}`,
+      `http://party-push-backend.us-east-1.elasticbeanstalk.com/Party/add-food-item-from-host?party_code=${props.hostData.partyCode}&item_name=${managementInfo.itemName}`,
       {
         method: "POST",
         headers: headers(props),
@@ -156,7 +156,7 @@ export default function PartyManagement(props: IPageProps) {
     const itemName = event.currentTarget.id;
     const status = event.currentTarget.value;
     fetch(
-      `https://localhost:5001/Party/change-food-status-from-host?party_code=${props.hostData.partyCode}&status=${status}&item_name=${itemName}`,
+      `http://party-push-backend.us-east-1.elasticbeanstalk.com/Party/change-food-status-from-host?party_code=${props.hostData.partyCode}&status=${status}&item_name=${itemName}`,
       {
         method: "POST",
         headers: headers(props),
@@ -165,16 +165,16 @@ export default function PartyManagement(props: IPageProps) {
       .then((response) => {
         return response.json().then((res) => {
           if (response.status === 200) {
-            const updatedFoodList = managementInfo.foodList
+            const updatedFoodList = managementInfo.foodList;
             updatedFoodList.forEach((item) => {
               if (item.item_name === itemName) {
-                item.status = status
+                item.status = status;
               }
-            })
+            });
             setManagementInfo({
               ...managementInfo,
               foodList: updatedFoodList,
-            })
+            });
             toast("Item Status Changed", {
               hideProgressBar: true,
               autoClose: 2000,
@@ -190,11 +190,13 @@ export default function PartyManagement(props: IPageProps) {
       });
   };
 
-  const removeFoodItemFromHost = (event: React.MouseEvent<HTMLButtonElement>) => {
+  const removeFoodItemFromHost = (
+    event: React.MouseEvent<HTMLButtonElement>
+  ) => {
     event.preventDefault();
     const itemName = event.currentTarget.id;
     fetch(
-      `https://localhost:5001/Party/remove-food-item-from-host?party_code=${props.hostData.partyCode}&item_name=${itemName}`,
+      `http://party-push-backend.us-east-1.elasticbeanstalk.com/Party/remove-food-item-from-host?party_code=${props.hostData.partyCode}&item_name=${itemName}`,
       {
         method: "POST",
         headers: headers(props),
@@ -233,14 +235,16 @@ export default function PartyManagement(props: IPageProps) {
               <ol>
                 {managementInfo.guestList.map((guest) => {
                   if (guest.at_party === 1) {
-                    return (<li>
-                      {guest.guest_name}
-                      <button
-                        className="delete"
-                        id={guest.guest_name}
-                        onClick={deleteGuest}
-                      ></button>
-                    </li>)
+                    return (
+                      <li>
+                        {guest.guest_name}
+                        <button
+                          className="delete"
+                          id={guest.guest_name}
+                          onClick={deleteGuest}
+                        ></button>
+                      </li>
+                    );
                   }
                 })}
               </ol>
@@ -248,14 +252,16 @@ export default function PartyManagement(props: IPageProps) {
               <ol>
                 {managementInfo.guestList.map((guest) => {
                   if (guest.at_party === 0) {
-                    return (<li>
-                      {guest.guest_name}
-                      <button
-                        className="delete"
-                        id={guest.guest_name}
-                        onClick={deleteGuest}
-                      ></button>
-                    </li>)
+                    return (
+                      <li>
+                        {guest.guest_name}
+                        <button
+                          className="delete"
+                          id={guest.guest_name}
+                          onClick={deleteGuest}
+                        ></button>
+                      </li>
+                    );
                   }
                 })}
               </ol>
@@ -290,7 +296,11 @@ export default function PartyManagement(props: IPageProps) {
                   <li>
                     {food.item_name}
                     <div className="select is-primary">
-                      <select id={food.item_name} onChange={changeFoodStatusFromHost} value={food.status}>
+                      <select
+                        id={food.item_name}
+                        onChange={changeFoodStatusFromHost}
+                        value={food.status}
+                      >
                         <option>full</option>
                         <option>low</option>
                         <option>out</option>
