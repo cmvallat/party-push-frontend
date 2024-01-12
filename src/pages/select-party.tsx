@@ -20,10 +20,13 @@ export default function SelectParty(props: IPageProps) {
   }, []);
 
   const getParties = () => {
-    fetch(`https://localhost:5001/Party/get-party-objects?username=nick`, {
-      method: "GET",
-      headers: headers(props),
-    })
+    fetch(
+      `http://party-push-backend.us-east-1.elasticbeanstalk.com/Party/get-party-objects?username=nick`,
+      {
+        method: "GET",
+        headers: headers(props),
+      }
+    )
       .then((response) => {
         const status = response.status;
         return response.json().then((res) => {
@@ -86,9 +89,14 @@ export default function SelectParty(props: IPageProps) {
       <NavBar />
       <section className="section">
         <div className="box">
-        <div className="level-left">
+          <div className="level-left">
             <h1 className="title level-item">Attending</h1>
-            <button className="button level-item is-primary" onClick={() => Router.push("/guest/join-party")}>+</button>
+            <button
+              className="button level-item is-primary"
+              onClick={() => Router.push("/guest/join-party")}
+            >
+              +
+            </button>
           </div>
           <div className="tile is-ancestor">
             <div className="tile is-vertical">
@@ -142,9 +150,17 @@ export default function SelectParty(props: IPageProps) {
       </section>
       <section className="section">
         <div className="box">
-          <div className="level-left">
-            <h1 className="title level-item">Hosting</h1>
-            <button className="button level-item is-primary" onClick={() => Router.push("/host/create-party")}>+</button>
+          <h1 className="title">Hosting</h1>
+          <div
+            className="icon-text"
+            onClick={() => {
+              Router.push("/host/create-party");
+            }}
+          >
+            <span className="icon">
+              <i className="fas fa-plane-departure"></i>
+            </span>
+            <span>flying</span>
           </div>
           <div className="tile is-ancestor">
             <div className="tile is-vertical">

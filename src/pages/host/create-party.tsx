@@ -25,7 +25,7 @@ export default function CreateParty(props: IPageProps) {
     event.preventDefault();
     const inviteOnly = partyInfo.inviteOnly ? 1 : 0;
     fetch(
-      `https://localhost:5001/Party/add-host?Party_name=${partyInfo.partyName}&Party_code=${partyInfo.partyCode}&Phone_number=${partyInfo.phoneNumber}&Invite_only=${inviteOnly}`,
+      `http://party-push-backend.us-east-1.elasticbeanstalk.com/Party/add-host?Party_name=${partyInfo.partyName}&Party_code=${partyInfo.partyCode}&Phone_number=${partyInfo.phoneNumber}&Invite_only=${inviteOnly}`,
       {
         method: "POST",
         headers: headers(props),
