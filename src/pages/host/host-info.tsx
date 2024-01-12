@@ -33,7 +33,7 @@ export default function PartyManagement(props: IPageProps) {
 
   const getPartyInfo = () => {
     fetch(
-      `http://party-push-backend.us-east-1.elasticbeanstalk.com/Party/get-party-info?party_code=${props.hostData.partyCode}`,
+      `party-push-backend.us-east-1.elasticbeanstalk.com/Party/get-party-info?party_code=${props.hostData.partyCode}`,
       {
         method: "GET",
         headers: headers(props),
@@ -60,7 +60,7 @@ export default function PartyManagement(props: IPageProps) {
   const addGuestFromHost = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     fetch(
-      `http://party-push-backend.us-east-1.elasticbeanstalk.com/Party/add-guest-from-host?host_invite_only=${props.hostData.inviteOnly}&guest_name=${managementInfo.guestUsername}&party_code=${props.hostData.partyCode}&guest_username=${managementInfo.guestUsername}`,
+      `party-push-backend.us-east-1.elasticbeanstalk.com/Party/add-guest-from-host?host_invite_only=${props.hostData.inviteOnly}&guest_name=${managementInfo.guestUsername}&party_code=${props.hostData.partyCode}&guest_username=${managementInfo.guestUsername}`,
       {
         method: "POST",
         headers: headers(props),
@@ -92,7 +92,7 @@ export default function PartyManagement(props: IPageProps) {
     event.preventDefault();
     const guestName = event.currentTarget.id;
     fetch(
-      `http://party-push-backend.us-east-1.elasticbeanstalk.com/Party/delete-guest?guest_name=${guestName}&party_code=${props.hostData.partyCode}`,
+      `party-push-backend.us-east-1.elasticbeanstalk.com/Party/delete-guest?guest_name=${guestName}&party_code=${props.hostData.partyCode}`,
       {
         method: "POST",
         headers: headers(props),
@@ -123,7 +123,7 @@ export default function PartyManagement(props: IPageProps) {
   const addFoodItemFromHost = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     fetch(
-      `http://party-push-backend.us-east-1.elasticbeanstalk.com/Party/add-food-item-from-host?party_code=${props.hostData.partyCode}&item_name=${managementInfo.itemName}`,
+      `party-push-backend.us-east-1.elasticbeanstalk.com/Party/add-food-item-from-host?party_code=${props.hostData.partyCode}&item_name=${managementInfo.itemName}`,
       {
         method: "POST",
         headers: headers(props),
@@ -156,7 +156,7 @@ export default function PartyManagement(props: IPageProps) {
     const itemName = event.currentTarget.id;
     const status = event.currentTarget.value;
     fetch(
-      `http://party-push-backend.us-east-1.elasticbeanstalk.com/Party/change-food-status-from-host?party_code=${props.hostData.partyCode}&status=${status}&item_name=${itemName}`,
+      `party-push-backend.us-east-1.elasticbeanstalk.com/Party/change-food-status-from-host?party_code=${props.hostData.partyCode}&status=${status}&item_name=${itemName}`,
       {
         method: "POST",
         headers: headers(props),
@@ -196,7 +196,7 @@ export default function PartyManagement(props: IPageProps) {
     event.preventDefault();
     const itemName = event.currentTarget.id;
     fetch(
-      `http://party-push-backend.us-east-1.elasticbeanstalk.com/Party/remove-food-item-from-host?party_code=${props.hostData.partyCode}&item_name=${itemName}`,
+      `party-push-backend.us-east-1.elasticbeanstalk.com/Party/remove-food-item-from-host?party_code=${props.hostData.partyCode}&item_name=${itemName}`,
       {
         method: "POST",
         headers: headers(props),

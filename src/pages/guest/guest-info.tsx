@@ -32,7 +32,7 @@ export default function GuestInfo(props: IPageProps) {
 
   const getHost = () => {
     fetch(
-      `http://party-push-backend.us-east-1.elasticbeanstalk.com/Party/get-host?party_code=${props.guestData.partyCode}`,
+      `party-push-backend.us-east-1.elasticbeanstalk.com/Party/get-host?party_code=${props.guestData.partyCode}`,
       {
         method: "GET",
         headers: headers(props),
@@ -57,7 +57,7 @@ export default function GuestInfo(props: IPageProps) {
 
   const getCurrentFoodList = () => {
     fetch(
-      `http://party-push-backend.us-east-1.elasticbeanstalk.com/Party/get-current-foods?party_code=${props.guestData.partyCode}`,
+      `party-push-backend.us-east-1.elasticbeanstalk.com/Party/get-current-foods?party_code=${props.guestData.partyCode}`,
       {
         method: "POST",
         headers: headers(props),
@@ -85,7 +85,7 @@ export default function GuestInfo(props: IPageProps) {
     const itemName = event.currentTarget.id;
     const status = event.currentTarget.value;
     fetch(
-      `http://party-push-backend.us-east-1.elasticbeanstalk.com/Party/update-food-status-from-guest?party_code=${props.guestData.partyCode}&status=${status}&guest_name=${props.guestData.guestName}&item_name=${itemName}`,
+      `party-push-backend.us-east-1.elasticbeanstalk.com/Party/update-food-status-from-guest?party_code=${props.guestData.partyCode}&status=${status}&guest_name=${props.guestData.guestName}&item_name=${itemName}`,
       {
         method: "POST",
         headers: headers(props),
@@ -122,7 +122,7 @@ export default function GuestInfo(props: IPageProps) {
   const leaveParty = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
     fetch(
-      `http://party-push-backend.us-east-1.elasticbeanstalk.com/Party/leave-party?party_code=${props.guestData.partyCode}&guest_name=${props.guestData.guestName}`,
+      `party-push-backend.us-east-1.elasticbeanstalk.com/Party/leave-party?party_code=${props.guestData.partyCode}&guest_name=${props.guestData.guestName}`,
       {
         method: "POST",
         headers: headers(props),
@@ -149,7 +149,7 @@ export default function GuestInfo(props: IPageProps) {
 
   const checkIn = () => {
     fetch(
-      `http://party-push-backend.us-east-1.elasticbeanstalk.com/Party/add-guest-from-check-in?party_code=${props.guestData.partyCode}&guest_name=${props.guestData.guestName}`,
+      `party-push-backend.us-east-1.elasticbeanstalk.com/Party/add-guest-from-check-in?party_code=${props.guestData.partyCode}&guest_name=${props.guestData.guestName}`,
       {
         method: "POST",
         headers: headers(props),
