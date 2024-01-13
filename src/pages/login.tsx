@@ -36,8 +36,9 @@ export default function Login(props: IPageProps) {
           if (status === 200) {
             props.setAuthenticationData({
               ...props.authenticationData,
-              token: res.message,
+              username: loginInfo.username,
             });
+            localStorage.setItem("token", res.message);
             Router.push("/select-party");
           } else {
             handleErrors(res);

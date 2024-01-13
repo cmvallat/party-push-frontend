@@ -1,5 +1,6 @@
 import { toast } from "react-toastify";
 import { IPageProps } from "@/pages/_app";
+import Router from "next/router";
 
 interface Error {
   message: string;
@@ -7,11 +8,15 @@ interface Error {
 
 export const handleErrors = (error: Error) => {
   if (error.message) {
-    toast(error.message, {
-      hideProgressBar: true,
-      autoClose: 2000,
-      type: "error",
-    });
+    if (error.message === "User could not be validated") {
+      Router.push("/login");
+    } else {
+      toast(error.message, {
+        hideProgressBar: true,
+        autoClose: 2000,
+        type: "error",
+      });
+    }
   } else {
     toast("An unknown error occured", {
       hideProgressBar: true,
@@ -24,7 +29,7 @@ export const handleErrors = (error: Error) => {
 export const headers = (props: IPageProps) => {
   return {
     "Content-Type": `application/json`,
-    "Authorization": `Bearer ${props.authenticationData.token}`,
+    "Authorization": `Bearer ${localStorage.getItem("token") as string}`,
   };
 };
 

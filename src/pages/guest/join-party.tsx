@@ -6,12 +6,10 @@ import { FormEvent, useState } from "react";
 import { handleErrors } from "@/utils/utils";
 import { headers } from "@/utils/utils";
 
-export default function CreateParty(props: IPageProps) {
+export default function JoinParty(props: IPageProps) {
   const [partyInfo, setPartyInfo] = useState({
-    partyName: "",
+    guestName: "",
     partyCode: "",
-    phoneNumber: "",
-    inviteOnly: false,
   });
 
   const handleChange = (key: string, value: string) => {
@@ -23,9 +21,8 @@ export default function CreateParty(props: IPageProps) {
 
   const joinParty = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const inviteOnly = partyInfo.inviteOnly ? 1 : 0;
     fetch(
-      `https://localhost:5001/Party/add-host?Party_name=${partyInfo.partyName}&Party_code=${partyInfo.partyCode}&Phone_number=${partyInfo.phoneNumber}&Invite_only=${inviteOnly}`,
+      `https://localhost:5001/Party/add-guest-from-check-in?party_code=${partyInfo.partyCode}&guest_name=${partyInfo.guestName}`,
       {
         method: "POST",
         headers: headers(props),
@@ -34,12 +31,11 @@ export default function CreateParty(props: IPageProps) {
       .then((response) => {
         return response.json().then((res) => {
           if (response.status === 200) {
-            props.setHostData({
-              ...props.hostData,
-              inviteOnly: inviteOnly,
+            props.setGuestData({
+              ...props.guestData,
               partyCode: partyInfo.partyCode,
             });
-            Router.push("/host/host-info");
+            Router.push("/guest/guest-info");
           } else {
             handleErrors(res);
           }

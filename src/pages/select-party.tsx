@@ -21,7 +21,7 @@ export default function SelectParty(props: IPageProps) {
 
   const getParties = () => {
     fetch(
-      `http://party-push-backend.us-east-1.elasticbeanstalk.com/Party/get-party-objects?username=nick`,
+      `http://party-push-backend.us-east-1.elasticbeanstalk.com/Party/get-party-objects?username=${props.authenticationData.username}`,
       {
         method: "GET",
         headers: headers(props),

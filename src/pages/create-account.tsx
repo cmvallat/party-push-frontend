@@ -37,8 +37,9 @@ export default function CreateAccount(props: IPageProps) {
           if (status === 200) {
             props.setAuthenticationData({
               ...props.authenticationData,
-              token: res.message,
+              username: createAccountInfo.username,
             });
+            localStorage.setItem("token", res.message);
             Router.push("/select-party");
           } else {
             handleErrors(res);
