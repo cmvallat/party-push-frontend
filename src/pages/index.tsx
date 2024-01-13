@@ -22,7 +22,7 @@ export default function Login(props: IPageProps) {
   const getUser = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     fetch(
-      `party-push-backend.us-east-1.elasticbeanstalk.com/Party/get-user?username=${loginInfo.username}&password=${loginInfo.password}`,
+      `http://party-push-backend.us-east-1.elasticbeanstalk.com/Party/get-user?username=${loginInfo.username}&password=${loginInfo.password}`,
       {
         method: "POST",
         headers: {
