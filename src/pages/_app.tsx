@@ -7,7 +7,7 @@ import { Dispatch } from "react";
 import type { AppProps } from "next/app";
 
 interface AuthenticationData {
-  token: string;
+  username: string;
 }
 
 interface GuestData {

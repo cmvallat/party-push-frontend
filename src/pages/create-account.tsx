@@ -23,7 +23,7 @@ export default function CreateAccount(props: IPageProps) {
   const createAccount = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     fetch(
-      `https://livepartyhelper.com/Party/add-user?username=${createAccountInfo.username}&password=${createAccountInfo.password}&phone_number=${createAccountInfo.phoneNumber}`,
+      `https://localhost:5001/Party/add-user?username=${createAccountInfo.username}&password=${createAccountInfo.password}&phone_number=${createAccountInfo.phoneNumber}`,
       {
         method: "GET",
         headers: {
@@ -37,8 +37,9 @@ export default function CreateAccount(props: IPageProps) {
           if (status === 200) {
             props.setAuthenticationData({
               ...props.authenticationData,
-              token: res.message,
+              username: createAccountInfo.username,
             });
+            localStorage.setItem("token", res.message);
             Router.push("/select-party");
           } else {
             handleErrors(res);

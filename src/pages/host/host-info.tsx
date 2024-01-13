@@ -8,17 +8,36 @@ import Router from "next/router";
 import { handleErrors } from "@/utils/utils";
 import { headers } from "@/utils/utils";
 
-export default function PartyManagement(props: IPageProps) {
-  const [managementInfo, setManagementInfo] = useState({
-    foodList: [{ item_name: "", party_code: "", status: "" }],
+export default function HostInfo(props: IPageProps) {
+  interface Food {
+    itemName: string;
+    partyCode: string;
+    status: string;
+  }
+
+  interface Guest {
+    guestName: string;
+    partyCode: string;
+    atParty: number;
+  }
+
+  interface HostInfoI {
+    foodList: Food[];
+    guestUsername: string;
+    guestList: Guest[];
+    itemName: string;
+  }
+
+  const [hostInfo, setHostInfo] = useState<HostInfoI>({
+    foodList: [],
     guestUsername: "",
-    guestList: [{ guest_name: "", party_code: "", at_party: 0 }],
+    guestList: [],
     itemName: "",
   });
 
   const handleChange = (key: string, value: string) => {
-    setManagementInfo({
-      ...managementInfo,
+    setHostInfo({
+      ...hostInfo,
       [key]: value,
     });
   };
@@ -42,10 +61,24 @@ export default function PartyManagement(props: IPageProps) {
       .then((response) => {
         return response.json().then((res) => {
           if (response.status === 200) {
-            setManagementInfo((prevState) => ({
+            const guestList: Guest[] = res.message[0]?.map((guest: any) => {
+              return {
+                guestName: guest.guest_name,
+                partyCode: guest.party_code,
+                atParty: guest.at_party,
+              };
+            });
+            const foodList: Food[] = res.message[1]?.map((food: any) => {
+              return {
+                itemName: food.item_name,
+                partyCode: food.party_code,
+                status: food.status,
+              };
+            });
+            setHostInfo((prevState) => ({
               ...prevState,
-              guestList: res.message[0],
-              foodList: res.message[1],
+              guestList: guestList ? guestList : [],
+              foodList: foodList ? foodList : [],
             }));
           } else {
             handleErrors(res);
@@ -60,7 +93,7 @@ export default function PartyManagement(props: IPageProps) {
   const addGuestFromHost = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     fetch(
-      `https://localhost:5001/Party/add-guest-from-host?host_invite_only=${props.hostData.inviteOnly}&guest_name=${managementInfo.guestUsername}&party_code=${props.hostData.partyCode}&guest_username=${managementInfo.guestUsername}`,
+      `https://localhost:5001/Party/add-guest-from-host?host_invite_only=${props.hostData.inviteOnly}&guest_name=${hostInfo.guestUsername}&party_code=${props.hostData.partyCode}&guest_username=${hostInfo.guestUsername}`,
       {
         method: "POST",
         headers: headers(props),
@@ -101,7 +134,7 @@ export default function PartyManagement(props: IPageProps) {
       .then((response) => {
         return response.json().then((res) => {
           if (response.status === 200) {
-            setManagementInfo((prevState) => ({
+            setHostInfo((prevState) => ({
               ...prevState,
               guestList: res.message,
             }));
@@ -120,10 +153,10 @@ export default function PartyManagement(props: IPageProps) {
       });
   };
 
-  const addFoodItemFromHost = (event: FormEvent<HTMLFormElement>) => {
+  const addFood = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     fetch(
-      `https://localhost:5001/Party/add-food-item-from-host?party_code=${props.hostData.partyCode}&item_name=${managementInfo.itemName}`,
+      `https://localhost:5001/Party/add-food?party_code=${props.hostData.partyCode}&item_name=${hostInfo.itemName}`,
       {
         method: "POST",
         headers: headers(props),
@@ -132,9 +165,16 @@ export default function PartyManagement(props: IPageProps) {
       .then((response) => {
         return response.json().then((res) => {
           if (response.status === 200) {
-            setManagementInfo((prevState) => ({
+            const foodList: Food[] = res.message.map((food: any) => {
+              return {
+                itemName: food.item_name,
+                partyCode: food.party_code,
+                status: food.status,
+              };
+            });
+            setHostInfo((prevState) => ({
               ...prevState,
-              foodList: res.message,
+              foodList,
             }));
             toast("Item Added", {
               hideProgressBar: true,
@@ -151,12 +191,12 @@ export default function PartyManagement(props: IPageProps) {
       });
   };
 
-  const changeFoodStatusFromHost = (event: ChangeEvent<HTMLSelectElement>) => {
+  const updateFoodStatusFromHost = (event: ChangeEvent<HTMLSelectElement>) => {
     event.preventDefault();
     const itemName = event.currentTarget.id;
     const status = event.currentTarget.value;
     fetch(
-      `https://localhost:5001/Party/change-food-status-from-host?party_code=${props.hostData.partyCode}&status=${status}&item_name=${itemName}`,
+      `https://localhost:5001/Party/update-food-status-from-host?party_code=${props.hostData.partyCode}&status=${status}&item_name=${itemName}`,
       {
         method: "POST",
         headers: headers(props),
@@ -165,20 +205,15 @@ export default function PartyManagement(props: IPageProps) {
       .then((response) => {
         return response.json().then((res) => {
           if (response.status === 200) {
-            const updatedFoodList = managementInfo.foodList
+            const updatedFoodList = hostInfo.foodList;
             updatedFoodList.forEach((item) => {
-              if (item.item_name === itemName) {
-                item.status = status
+              if (item.itemName === itemName) {
+                item.status = status;
               }
-            })
-            setManagementInfo({
-              ...managementInfo,
+            });
+            setHostInfo({
+              ...hostInfo,
               foodList: updatedFoodList,
-            })
-            toast("Item Status Changed", {
-              hideProgressBar: true,
-              autoClose: 2000,
-              type: "success",
             });
           } else {
             handleErrors(res);
@@ -190,11 +225,11 @@ export default function PartyManagement(props: IPageProps) {
       });
   };
 
-  const removeFoodItemFromHost = (event: React.MouseEvent<HTMLButtonElement>) => {
+  const deleteFood = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
     const itemName = event.currentTarget.id;
     fetch(
-      `https://localhost:5001/Party/remove-food-item-from-host?party_code=${props.hostData.partyCode}&item_name=${itemName}`,
+      `https://localhost:5001/Party/delete-food?party_code=${props.hostData.partyCode}&item_name=${itemName}`,
       {
         method: "POST",
         headers: headers(props),
@@ -203,9 +238,16 @@ export default function PartyManagement(props: IPageProps) {
       .then((response) => {
         return response.json().then((res) => {
           if (response.status === 200) {
-            setManagementInfo((prevState) => ({
+            const foodList: Food[] = res.message.map((food: any) => {
+              return {
+                itemName: food.item_name,
+                partyCode: food.party_code,
+                status: food.status,
+              };
+            });
+            setHostInfo((prevState) => ({
               ...prevState,
-              foodList: res.message,
+              foodList,
             }));
             toast("Item Deleted", {
               hideProgressBar: true,
@@ -231,31 +273,35 @@ export default function PartyManagement(props: IPageProps) {
             <div className="notification is-primary">
               Guests at Party:
               <ol>
-                {managementInfo.guestList.map((guest) => {
-                  if (guest.at_party === 1) {
-                    return (<li>
-                      {guest.guest_name}
-                      <button
-                        className="delete"
-                        id={guest.guest_name}
-                        onClick={deleteGuest}
-                      ></button>
-                    </li>)
+                {hostInfo.guestList.map((guest) => {
+                  if (guest.atParty === 1) {
+                    return (
+                      <li>
+                        {guest.guestName}
+                        <button
+                          className="delete"
+                          id={guest.guestName}
+                          onClick={deleteGuest}
+                        ></button>
+                      </li>
+                    );
                   }
                 })}
               </ol>
               Guests invited:
               <ol>
-                {managementInfo.guestList.map((guest) => {
-                  if (guest.at_party === 0) {
-                    return (<li>
-                      {guest.guest_name}
-                      <button
-                        className="delete"
-                        id={guest.guest_name}
-                        onClick={deleteGuest}
-                      ></button>
-                    </li>)
+                {hostInfo.guestList.map((guest) => {
+                  if (guest.atParty === 0) {
+                    return (
+                      <li>
+                        {guest.guestName}
+                        <button
+                          className="delete"
+                          id={guest.guestName}
+                          onClick={deleteGuest}
+                        ></button>
+                      </li>
+                    );
                   }
                 })}
               </ol>
@@ -286,11 +332,15 @@ export default function PartyManagement(props: IPageProps) {
             <div className="notification is-primary">
               Food:
               <ol>
-                {managementInfo.foodList.map((food) => (
+                {hostInfo.foodList.map((food) => (
                   <li>
-                    {food.item_name}
+                    {food.itemName}
                     <div className="select is-primary">
-                      <select id={food.item_name} onChange={changeFoodStatusFromHost} value={food.status}>
+                      <select
+                        id={food.itemName}
+                        onChange={updateFoodStatusFromHost}
+                        value={food.status}
+                      >
                         <option>full</option>
                         <option>low</option>
                         <option>out</option>
@@ -298,8 +348,8 @@ export default function PartyManagement(props: IPageProps) {
                     </div>
                     <button
                       className="delete"
-                      id={food.item_name}
-                      onClick={removeFoodItemFromHost}
+                      id={food.itemName}
+                      onClick={deleteFood}
                     ></button>
                   </li>
                 ))}
@@ -307,7 +357,7 @@ export default function PartyManagement(props: IPageProps) {
             </div>
             <br />
             <div className="notification is-primary">
-              <form className="box" onSubmit={addFoodItemFromHost}>
+              <form className="box" onSubmit={addFood}>
                 <div className="field">
                   <label className="label">Item Name</label>
                   <div className="control">

@@ -20,7 +20,7 @@ export default function SelectParty(props: IPageProps) {
   }, []);
 
   const getParties = () => {
-    fetch(`https://localhost:5001/Party/get-party-objects?username=nick`, {
+    fetch(`https://localhost:5001/Party/get-party-objects?username=${props.authenticationData.username}`, {
       method: "GET",
       headers: headers(props),
     })
