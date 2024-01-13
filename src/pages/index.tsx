@@ -1,54 +1,8 @@
 import NavBar from "@/components/NavBar";
 import Link from "next/link";
-import { FormEvent } from "react";
-import { useState } from "react";
-import Router from "next/router";
-import { handleErrors } from "@/utils/utils";
 import { IPageProps } from "./_app";
 
 export default function Login(props: IPageProps) {
-  const [loginInfo, setLoginInfo] = useState({
-    username: "",
-    password: "",
-  });
-
-  const handleChange = (key: string, value: string) => {
-    setLoginInfo({
-      ...loginInfo,
-      [key]: value,
-    });
-  };
-
-  const getUser = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    fetch(
-      `http://party-push-backend.us-east-1.elasticbeanstalk.com/Party/get-user?username=${loginInfo.username}&password=${loginInfo.password}`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    )
-      .then((response) => {
-        const status = response.status;
-        return response.json().then((res) => {
-          if (status === 200) {
-            props.setAuthenticationData({
-              ...props.authenticationData,
-              token: res.message,
-            });
-            Router.push("/select-party");
-          } else {
-            handleErrors(res);
-          }
-        });
-      })
-      .catch((error) => {
-        handleErrors(error);
-      });
-  };
-
   return (
     <>
       <NavBar />
